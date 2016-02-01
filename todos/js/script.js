@@ -38,7 +38,8 @@ function clearDisplay () {
 
 
 // This function make marcup for visual "todos" notes
-// arguments: content - content of the note, value - value of the checkbox
+// arguments: content - content of the note, selection - checking style-class ability, id - id of note, state - (completed, active),
+// eddition - state of 'list-item__edit-text' (false - hidden, true - active)
 function formListMarcup (content, selection, id, state, eddition) {
   if (!eddition) {
     var containerState = '';
@@ -53,11 +54,13 @@ function formListMarcup (content, selection, id, state, eddition) {
   if (state === 'completed') {
     checked = 'checked';
   } 
+  console.log(focus);
   var listMarcup = '<li class="list-item-container__list-item" id="'+ id +'"> \
                       <div class="list-item__visible-block '+ containerState +'"> \
-                        <input class="list-item__checkbox" type="checkbox" name="note-checkbox"' + checked + '/> \
-                        <label class="list-item__text ' + selection + '">' + content + '</label> \
-                        <button class="list-item__del-btn  del-current-list-item">X</button> \
+                        <input class="list-item__checkbox" id="checkbox-' + id + '" type="checkbox" name="note-checkbox"' + checked +'/>\ ' +  
+                        '<label for="checkbox-' + id + '" class="list-item__checkbox-label"></label> \ ' +                    
+                        '<label class="list-item__text ' + selection + '">' + content + '</label> \ ' +                    
+                        '<button class="list-item__del-btn  del-current-list-item">X</button> \
                       </div> \
                       <input type="text" class="list-item__edit-text ' + editorState + '" value="' + content + '"' + focus + '/> \
                     </li>'
@@ -75,7 +78,6 @@ function checkForEddition (noteId, edditionBoolean, content) {
 }
 
 // This function renders adddition and removing of notes
-// adds actionlisterners for checkboxes, del-buttons, delAllCheckedNote button and checkAllBtn
 function renderList (renderingList) {
   noteList = document.getElementById('list');
   listFooter = document.getElementById('footer');
@@ -115,7 +117,12 @@ function deleteFromList (parameter, id) {
 
 // This function renders filtred notes
 function renderingFiltredList () {
-
+  var allFilter = document.getElementById('all-filter');
+  var activeFilter = document.getElementById('active-filter');
+  var completedFilter = document.getElementById('completed-filter');
+  allFilter.classList.remove('list-footer__filters--active');
+  activeFilter.classList.remove('list-footer__filters--active');
+  completedFilter.classList.remove('list-footer__filters--active');
   function displayItems (state) {
     var renderingList = list.filter(function activateFilter(item) {
       return item.state === state;
@@ -125,16 +132,19 @@ function renderingFiltredList () {
   
   if (filter === 'All') {
     renderList(list);
+    allFilter.classList.add('list-footer__filters--active');
   } else if (filter === 'Active') {
     renderList(displayItems('active'));
+    activeFilter.classList.add('list-footer__filters--active');
   } else if (filter === 'Completed') {
     renderList(displayItems('completed'));
+    completedFilter.classList.add('list-footer__filters--active');
   } 
 }
 
 
 // This function checks for checboxes checking and adds behavior for them
-// args: item - parent note-block, checkbox - note checkbox, label - note checkbox label
+// args: 
 function checkForChecked (checkbox, id) {
   var checkNote = list.filter(function defineCheckedNote (item) {
         return item.id === id;
