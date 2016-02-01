@@ -40,6 +40,22 @@
   outline: 1px solid red;
 }
 
+.list-item__visible-block{
+  display: block;  
+}
+
+.list-item__visible-block.hidden{
+  display: none;  
+}
+
+.list-item__edit-text {
+  display: none;
+}
+
+.list-item__edit-text.visible {
+  display: block;
+}
+
 .list-item__checkbox {
   display: inline-block;
   vertical-align: middle;
@@ -54,6 +70,10 @@
   width: 80%;
   font-size: 20px;
   word-break: break-word;
+}
+
+.list-item__text--checked {
+  color: green;
 }
 
 .list-item__edit-text {

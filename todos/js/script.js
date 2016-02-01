@@ -14,19 +14,23 @@ var delAllCheckedNotes = document.getElementById('del-checked-items-btn');
 function addToList () {
   newListItemId++;
   var newListItem = new Object();
-  newListItem.id = newListItemId;
+  newListItem.id = 'note' + newListItemId;
+  newListItem.state = 'active';
+  newListItem.selection = '';
+  newListItem.eddition = false;
   newListItem.content = getDisplayvalue();
-
-  newListItem.marcup = formListMarcup(newListItem.content, newListItemId);
-  
+  newListItem.marcup = formListMarcup(newListItem.content, newListItem.selection, newListItem.id, newListItem.state, newListItem.eddition);
   list.push(newListItem);
+  console.log(newListItem);
   totalItemsCount = list.length;
 }
 
 
+//???//
 function getDisplayvalue () {
  return document.getElementById('list-display').value;
 }
+
 
 function clearDisplay () {
   document.getElementById('list-display').value = null; 
@@ -35,71 +39,52 @@ function clearDisplay () {
 
 // This function make marcup for visual "todos" notes
 // arguments: content - content of the note, value - value of the checkbox
-function formListMarcup (content, value) {
-  var listMarcup = '<div class="list-item__visible-block"> \
-                     <input class="list-item__checkbox" type="checkbox" id="checkbox'+ value +'" name="note-checkbox" value="'+ value +'"/> \
-                     <label class="list-item__text">' + content + '</label> \
-                     <button class="list-item__del-btn  del-current-list-item">X</button>\
-                   </div> \
-                   <input type="text" class="list-item__edit-text"/>'
-                  
+function formListMarcup (content, selection, id, state, eddition) {
+  if (!eddition) {
+    var containerState = '';
+    var editorState = '';
+    var focus = '';    
+  } else {
+    var containerState = 'hidden';
+    var editorState = 'visible';
+    var focus = ' autofocus'
+  }
+  var checked = '';
+  if (state === 'completed') {
+    checked = 'checked';
+  } 
+  var listMarcup = '<li class="list-item-container__list-item" id="'+ id +'"> \
+                      <div class="list-item__visible-block '+ containerState +'"> \
+                        <input class="list-item__checkbox" type="checkbox" name="note-checkbox"' + checked + '/> \
+                        <label class="list-item__text ' + selection + '">' + content + '</label> \
+                        <button class="list-item__del-btn  del-current-list-item">X</button> \
+                      </div> \
+                      <input type="text" class="list-item__edit-text ' + editorState + '" value="' + content + '"' + focus + '/> \
+                    </li>'
   return listMarcup;              
 }
 
+function checkForEddition (noteId, edditionBoolean, content) {
+  var editedNote = list.filter(function activateFilter(item) {
+    return item.id === noteId;
+  })[0];
+
+  editedNote.content = content;  
+  editedNote.eddition = edditionBoolean;
+  editedNote.marcup = formListMarcup(editedNote.content, editedNote.selection, editedNote.id, editedNote.state, editedNote.eddition);
+}
 
 // This function renders adddition and removing of notes
 // adds actionlisterners for checkboxes, del-buttons, delAllCheckedNote button and checkAllBtn
-function addToListVisual () {
+function renderList (renderingList) {
   noteList = document.getElementById('list');
-  var listItem = document.createElement('LI');
-  
-  listItem.id = newListItemId;
-  listItem.classList.add('list-item-container__list-item', 'active');
-  listItem.innerHTML = list[(list.length-1)].marcup;
-  noteList.appendChild(listItem);
-  
-  checkForItemsAvailability();
-}
-
-// This function removes notes from notes array
-function deleteFromList (id) {
-  list = list.filter(function activeFilter(item) {
-    return item.id != id;
-  });
- totalItemsCount = list.length; 
- checkForItemsAvailability();
-}
-
-// This function renders filtred notes
-function renderingFiltredList () {
-  var listItems = document.querySelectorAll('.list-item-container__list-item');
-  var activeItems = document.querySelectorAll('.active');
-  var comletedItems = document.querySelectorAll('.completed');
-  
-  function displayItems (items, state) {
-    for (var i = 0, l = items.length; i < l; i++) {
-      (function (j) {
-        items[j].style.display = state;
-      })(i);
-    }
-  }
-  
-  if (filter === 'All') {
-    displayItems(listItems, 'block');
-  } else if (filter === 'Active') {
-    displayItems(comletedItems, 'none');
-    displayItems(activeItems, 'block');
-  } else if (filter === 'Completed') {
-    displayItems(activeItems, 'none');
-    displayItems(comletedItems, 'block');
-  } 
-}
-
-
-// This function checks for availibility of notes and adds "footer" and "checK-all-btn"
-function checkForItemsAvailability () {
   listFooter = document.getElementById('footer');
   var listItemCounter = document.getElementById('counter');
+  noteList.innerHTML = '';
+  
+  for (var i = 0, l = renderingList.length; i < l; i++) {
+    noteList.insertAdjacentHTML('beforeEnd', renderingList[i].marcup);
+  }
 
   if (totalItemsCount === 0) {
     listFooter.style.display = 'none';
@@ -109,33 +94,7 @@ function checkForItemsAvailability () {
     checkAllBtn.style.visibility = 'visible';
     listItemCounter.innerHTML = totalItemsCount;
   }
-}
 
-
-// This function checks for checboxes checking and adds behavior for them
-// args: item - parent note-block, checkbox - note checkbox, label - note checkbox label
-function checkForChecked (item, checkbox, label) {
-  if (checkbox.checked) {          
-     label.style.color = 'red';
-
-     if (filter === 'active') {
-       item.style.display = 'none';
-     }
-
-     item.classList.add('completed');
-     item.classList.remove('active');
-            
-     } else {
-     label.style.color = 'black';
-
-     if (filter === 'completed') {
-       item.style.display = 'none';
-      }
-          
-      item.classList.add('active');
-      item.classList.remove('completed');    
-  }
-  
   if (checkForCheckedCheckboxes()) {
     delAllCheckedNotes.style.visibility = 'visible';
   } else {
@@ -143,12 +102,77 @@ function checkForChecked (item, checkbox, label) {
   }
 }
 
+
+
+// This function removes notes from notes array
+function deleteFromList (parameter, id) {
+  list = list.filter(function activeFilter(item) {
+    return item[parameter] != id;
+  });
+ totalItemsCount = list.length; 
+}
+
+
+// This function renders filtred notes
+function renderingFiltredList () {
+
+  function displayItems (state) {
+    var renderingList = list.filter(function activateFilter(item) {
+      return item.state === state;
+    });
+    return renderingList;
+  }
+  
+  if (filter === 'All') {
+    renderList(list);
+  } else if (filter === 'Active') {
+    renderList(displayItems('active'));
+  } else if (filter === 'Completed') {
+    renderList(displayItems('completed'));
+  } 
+}
+
+
+// This function checks for checboxes checking and adds behavior for them
+// args: item - parent note-block, checkbox - note checkbox, label - note checkbox label
+function checkForChecked (checkbox, id) {
+  var checkNote = list.filter(function defineCheckedNote (item) {
+        return item.id === id;
+      })[0];
+  if (checkbox.checked) {    
+    checkNote.state = 'completed';
+    checkNote.selection = 'list-item__text--checked';
+  } else {
+    checkNote.state = 'active';
+    checkNote.selection = '';      
+  }
+  checkNote.marcup = formListMarcup(checkNote.content, checkNote.selection, checkNote.id, checkNote.state);
+
+}
+
+function checkAllNotes (checkAll) {
+  var len = list.length;
+  if (checkAll.checked) {
+    for (var i = 0; i < len; i++) {
+      var item = list[i];
+      item.state = 'completed';
+      item.selection = 'list-item__text--checked';
+      item.marcup = formListMarcup(item.content, item.selection, item.id, item.state);
+    }           
+  } else {
+    for (var i = 0; i < len; i++) {
+      var item = list[i];
+      item.state = 'active';
+      item.selection = '';
+      item.marcup = formListMarcup(item.content, item.selection, item.id, item.state);
+    }
+  }
+}
+
 // This function checks for only one of checboxes is checking and return boolean
 function checkForCheckedCheckboxes () {
-  var checkboxes = document.querySelectorAll('.list-item__checkbox');
-  checkboxes = Array.prototype.slice.call(checkboxes);
-  var checkboxChecked = checkboxes.some(function (item) {
-    return item.checked === true;
+  var checkboxChecked = list.some(function (item) {
+    return item.state === 'completed';
   });
 
   return checkboxChecked;
@@ -161,78 +185,58 @@ noteList.addEventListener('dblclick', function activeNoteEditor (event) {
   if (!target.classList.contains('list-item__text')) {
     return;
   }
-  
+  var content = target.innerHTML;
   var note = target.parentNode.parentNode;
-  var noteVisibleContainer = target.parentNode;
-  var noteEditor = note.querySelector('.list-item__edit-text');
-  var noteLabel = note.querySelector('.list-item__text');
+  var noteId = note.id;
 
-  noteEditor.value = noteLabel.innerHTML;
-  noteVisibleContainer.style.display = 'none';
-  noteEditor.style.display = 'block';
-  noteEditor.focus();
-});
+  checkForEddition(noteId, true, content);
+  renderingFiltredList();
+}, false);
+
 
 todos.addEventListener('blur', function focusLost(event) {
   var target = event.target;
   if(!target.classList.contains('list-item__edit-text')){
     return;
-  } else {
-    var note = target.parentNode;
-    var noteLabel = note.querySelector('.list-item__text');
-    var noteVisibleContainer = note.querySelector('.list-item__visible-block');
-    noteLabel.innerHTML = target.value;
-    
-    for( var i = 0, l = list.length; i < l; i++) {
-      if(list[i].id === note.id) {
-        list[i].content = target.value;
-      }
-    }
-    
-    target.style.display = 'none';
-    noteVisibleContainer.style.display = 'block';
-  }
+  } 
+  var content = target.value;
+  var note = target.parentNode;
+  var noteId = note.id;
 
+  checkForEddition(noteId, false, content);
+  renderingFiltredList(); 
 }, true);
+
 
 todos.addEventListener('change', function (event) {
   var target = event.target
   
   if (target.classList.contains('list-item__checkbox')) {
     var note = target.parentNode.parentNode;
-    var noteLabel = note.querySelector('.list-item__text');
-    checkForChecked(note, target, noteLabel);
+    var noteId = note.id;
+
+    checkForChecked(target, noteId);
+    renderingFiltredList();
     
   } else if (target.id === 'checK-all-btn') {
-    var checkingItems = noteList.querySelectorAll('.list-item-container__list-item');
-      for (var i = 0, l = checkingItems.length; i < l; i++) {
-        (function(j) {
-          var checkingItem = checkingItems[j];
-          var checkingItemLabel = checkingItem.querySelector('.list-item__text');
-          var checkingItemCheckbox = checkingItem.querySelector('.list-item__checkbox');
-          if (target.checked === true) {
-            checkingItemCheckbox.checked = true;
-          } else {
-            checkingItemCheckbox.checked = false;
-          }
-          checkForChecked(checkingItem, checkingItemCheckbox, checkingItemLabel);
-        })(i);
-      }
-    
+    checkAllNotes(target);
+    renderingFiltredList();
   } else {
     return;
   }
 }, false);
 
-noteList.addEventListener('click', function(event) {
+
+noteList.addEventListener('click', function activateDelBtn(event) {
   var target = event.target;
+  var note = target.parentNode.parentNode;
   if (!target.classList.contains('del-current-list-item')) {
     return;
-  }
-  var note = target.parentNode.parentNode;
-  deleteFromList(note.id);
-  note.remove(note);
-}); 
+  } 
+  deleteFromList('id', note.id);
+  renderingFiltredList();
+}, false); 
+
 
 listFooter.addEventListener('click', function activateFilter(event) {
   var target = event.target;
@@ -242,15 +246,8 @@ listFooter.addEventListener('click', function activateFilter(event) {
     filter = target.innerHTML;
     renderingFiltredList();
   } else if (target.id === 'del-checked-items-btn') {
-    var comletedItems = document.querySelectorAll('.completed');
-    console.log(comletedItems);
-    for (var i = 0, l = comletedItems.length; i < l; i++) {
-     (function(j) {
-       var comletedItem = comletedItems[j];
-       deleteFromList(comletedItem.id);
-       comletedItem.remove(comletedItem);    
-      })(i);
-    }
+    deleteFromList('state', 'completed');
+    renderingFiltredList();
   } else {
     return;
   }
@@ -268,7 +265,7 @@ todos.addEventListener('keyup', function(event) {
   } 
   if (target.id === 'list-display' && enterKey && target.value) {
     addToList();
-    addToListVisual();    
+    renderingFiltredList();   
     clearDisplay();
   } else if (target.classList.contains('list-item__edit-text') && enterKey && target.value) {
     target.blur();
