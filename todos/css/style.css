@@ -32,6 +32,10 @@
   visibility: hidden;
 }
 
+.list-header__btn--visible {
+  visibility: visible;
+}
+
 .list-item-container__list {
   list-style: none;
   padding: 0;
@@ -141,6 +145,10 @@
   text-align: center;
 }
 
+.list-footer--visible {
+  display: block;
+}
+
 .list-footer:before {
   content: '';
   position: absolute;
@@ -218,3 +226,8 @@
 .list-footer__del-btn:hover {
   text-decoration: underline;
 }
+
+.list-footer__del-btn--visible {
+  visibility: visible;
+}
+

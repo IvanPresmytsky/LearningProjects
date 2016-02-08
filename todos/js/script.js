@@ -1,250 +1,255 @@
-var list = []; // array of the notes
-var totalItemsCount = 0; // notes quantity
-var newListItemId = 0;  // var for notes id creating
+var list = []; // array of the todos
+
+var newListItemId = 0;  // var for todos id creating
 var filter = 'All'; // (Active, Completed) var for filter behavior
 var todos = document.getElementById('list-container');
 var listFooter = document.getElementById('footer');
-var noteList = document.getElementById('list');
+var todosList = document.getElementById('list');
 var display = document.getElementById('list-display');
 var checkAllBtn = document.getElementById('checK-all-btn');
-var delAllCheckedNotes = document.getElementById('del-checked-items-btn');
+var delAllCheckedTodos = document.getElementById('del-checked-items-btn');
 
 
-// This function add notes to notes array
+// This function add todos to todos array
 function addToList () {
   newListItemId++;
   var newListItem = new Object();
-  newListItem.id = 'note' + newListItemId;
-  newListItem.state = 'active';
-  newListItem.selection = '';
-  newListItem.eddition = false;
-  newListItem.content = getDisplayvalue();
-  newListItem.marcup = formListMarcup(newListItem.content, newListItem.selection, newListItem.id, newListItem.state, newListItem.eddition);
+  newListItem.id = newListItemId;
+  newListItem.state = 'Active';
+  newListItem.selection = false;
+  newListItem.edition = false;
+  newListItem.content = display.value;
   list.push(newListItem);
   console.log(newListItem);
-  totalItemsCount = list.length;
 }
 
 
-//???//
-function getDisplayvalue () {
- return document.getElementById('list-display').value;
-}
-
-
-function clearDisplay () {
-  document.getElementById('list-display').value = null; 
-}
-
-
-// This function make marcup for visual "todos" notes
-// arguments: content - content of the note, selection - checking style-class ability, id - id of note, state - (completed, active),
-// eddition - state of 'list-item__edit-text' (false - hidden, true - active)
-function formListMarcup (content, selection, id, state, eddition) {
-  if (!eddition) {
+// This function make marcup for visual "todos" todos
+// arguments: content - content of the todos, selection - checking style-class ability, id - id of todos, state - (completed, active),
+// edition - state of 'list-item__edit-text' (false - hidden, true - active)
+function formListMarkup (content, selection, id, state, edition) {
+  if (!edition) {
     var containerState = '';
     var editorState = '';
-    var focus = '';    
   } else {
     var containerState = 'hidden';
     var editorState = 'visible';
-    var focus = ' autofocus'
   }
   var checked = '';
-  if (state === 'completed') {
+  if (state === 'Completed') {
     checked = 'checked';
   } 
-  console.log(focus);
-  var listMarcup = '<li class="list-item-container__list-item" id="'+ id +'"> \
+  if (selection) {
+    var selectionClass = 'list-item__text--checked';
+  } else {
+    var selectionClass = '';
+  }
+
+  var listMarKup = '<li class="list-item-container__list-item" id="'+ id +'"> \
                       <div class="list-item__visible-block '+ containerState +'"> \
-                        <input class="list-item__checkbox" id="checkbox-' + id + '" type="checkbox" name="note-checkbox"' + checked +'/>\ ' +  
+                        <input class="list-item__checkbox" id="checkbox-' + id + '" type="checkbox" name="todos-checkbox"' + checked +'/>\ ' +  
                         '<label for="checkbox-' + id + '" class="list-item__checkbox-label"></label> \ ' +                    
-                        '<label class="list-item__text ' + selection + '">' + content + '</label> \ ' +                    
+                        '<label class="list-item__text ' + selectionClass + '">' + content + '</label> \ ' +                    
                         '<button class="list-item__del-btn  del-current-list-item">X</button> \
                       </div> \
-                      <input type="text" class="list-item__edit-text ' + editorState + '" value="' + content + '"' + focus + '/> \
+                      <input type="text" class="list-item__edit-text ' + editorState + '" value="' + content + '"/> \
                     </li>'
-  return listMarcup;              
+  return listMarKup;              
 }
 
-function checkForEddition (noteId, edditionBoolean, content) {
-  var editedNote = list.filter(function activateFilter(item) {
-    return item.id === noteId;
-  })[0];
 
-  editedNote.content = content;  
-  editedNote.eddition = edditionBoolean;
-  editedNote.marcup = formListMarcup(editedNote.content, editedNote.selection, editedNote.id, editedNote.state, editedNote.eddition);
+function setEditableState (todosId, isEditable, content) {
+  var editedTodos = list.find(function findEditableItem (item) {
+    return item.id == todosId;
+  });
+  if (arguments[2]) {
+    editedTodos.content = content;
+  }
+  editedTodos.edition = isEditable;
 }
 
-// This function renders adddition and removing of notes
+
+// This function renders adddition and removing of todos
 function renderList (renderingList) {
-  noteList = document.getElementById('list');
+  todosList = document.getElementById('list');
   listFooter = document.getElementById('footer');
   var listItemCounter = document.getElementById('counter');
-  noteList.innerHTML = '';
+  todosList.innerHTML = '';
   
   for (var i = 0, l = renderingList.length; i < l; i++) {
-    noteList.insertAdjacentHTML('beforeEnd', renderingList[i].marcup);
+
+    var listItemMarkup = formListMarkup(renderingList[i].content, renderingList[i].selection, renderingList[i].id, renderingList[i].state, renderingList[i].edition);
+    todosList.insertAdjacentHTML('beforeEnd', listItemMarkup);
+
+    var todosEditor = todosList.getElementsByClassName('list-item__edit-text')[i];
+    var todosLabel = todosList.getElementsByClassName('list-item__text')[i];
+
+    todosLabel.addEventListener('dblclick', function activateTodosEditor (event) {
+      var target = event.target;   
+      var todosId = target.parentNode.parentNode.id;
+
+      setEditableState(todosId, true);
+      renderTodos();
+      todosEditor.focus();
+    }, false);
+
+
+    todosEditor.addEventListener('blur', function focusLost(event) {
+      var target = event.target;
+      var content = target.value;
+      var todosId = target.parentNode.id;
+
+      setEditableState(todosId, false, content);
+      renderTodos(); 
+    }, true);
+
   }
 
-  if (totalItemsCount === 0) {
-    listFooter.style.display = 'none';
-    checkAllBtn.style.visibility = 'hidden';
+  if (list.length === 0) {
+    listFooter.classList.remove('list-footer--visible');
+    checkAllBtn.classList.remove('list-header__btn--visible');
   } else {
-    listFooter.style.display = 'block';
-    checkAllBtn.style.visibility = 'visible';
-    listItemCounter.innerHTML = totalItemsCount;
+    listFooter.classList.add('list-footer--visible');
+    checkAllBtn.classList.add('list-header__btn--visible');
+    listItemCounter.innerHTML = list.length;
   }
 
-  if (checkForCheckedCheckboxes()) {
-    delAllCheckedNotes.style.visibility = 'visible';
+  if (checkingForCheckedTodos()) {
+    delAllCheckedTodos.classList.add('list-footer__del-btn--visible');
   } else {
-    delAllCheckedNotes.style.visibility = 'hidden';
+    delAllCheckedTodos.classList.remove('list-header__del-btn--visible');
   }
+
+
+
 }
 
 
-
-// This function removes notes from notes array
+// This function removes todos from todos array
 function deleteFromList (parameter, id) {
-  list = list.filter(function activeFilter(item) {
+  list = list.filter(function deleteItem (item) {
     return item[parameter] != id;
   });
- totalItemsCount = list.length; 
 }
 
 
-// This function renders filtred notes
-function renderingFiltredList () {
+// This function renders filtred todos
+function renderTodos () {
   var allFilter = document.getElementById('all-filter');
   var activeFilter = document.getElementById('active-filter');
   var completedFilter = document.getElementById('completed-filter');
+
   allFilter.classList.remove('list-footer__filters--active');
   activeFilter.classList.remove('list-footer__filters--active');
   completedFilter.classList.remove('list-footer__filters--active');
-  function displayItems (state) {
-    var renderingList = list.filter(function activateFilter(item) {
-      return item.state === state;
-    });
-    return renderingList;
-  }
-  
-  if (filter === 'All') {
-    renderList(list);
-    allFilter.classList.add('list-footer__filters--active');
-  } else if (filter === 'Active') {
-    renderList(displayItems('active'));
+
+  //от if-ов не удалось уйти из-за необходимости подсвечивания активного фильтра
+
+if (filter === 'All') {
+  renderList(list);
+  allFilter.classList.add('list-footer__filters--active');
+} else {
+  var todosToRender = list.filter(function activateFilter(item) {
+    return item.state === filter;
+  });
+
+  if (filter === 'Active') {
     activeFilter.classList.add('list-footer__filters--active');
   } else if (filter === 'Completed') {
-    renderList(displayItems('completed'));
     completedFilter.classList.add('list-footer__filters--active');
-  } 
+  }
+
+  renderList(todosToRender);
+}
+ 
 }
 
 
 // This function checks for checboxes checking and adds behavior for them
 // args: 
-function checkForChecked (checkbox, id) {
-  var checkNote = list.filter(function defineCheckedNote (item) {
-        return item.id === id;
-      })[0];
+function serchingForCheckedTodos (checkbox, id) {
+  var checkTodos = list.find(function defineCheckedTodos (item) {
+        return item.id == id;
+  });
+  console.log(checkTodos);
   if (checkbox.checked) {    
-    checkNote.state = 'completed';
-    checkNote.selection = 'list-item__text--checked';
+    checkTodos.state = 'Completed';
+    checkTodos.selection = true;
   } else {
-    checkNote.state = 'active';
-    checkNote.selection = '';      
+    checkTodos.state = 'Active';
+    checkTodos.selection = false;      
   }
-  checkNote.marcup = formListMarcup(checkNote.content, checkNote.selection, checkNote.id, checkNote.state);
 
 }
 
-function checkAllNotes (checkAll) {
+function checkAllTodos (checkAll) {
   var len = list.length;
   if (checkAll.checked) {
     for (var i = 0; i < len; i++) {
       var item = list[i];
-      item.state = 'completed';
-      item.selection = 'list-item__text--checked';
-      item.marcup = formListMarcup(item.content, item.selection, item.id, item.state);
+      item.state = 'Completed';
+      item.selection = true;
     }           
   } else {
     for (var i = 0; i < len; i++) {
       var item = list[i];
-      item.state = 'active';
-      item.selection = '';
-      item.marcup = formListMarcup(item.content, item.selection, item.id, item.state);
+      item.state = 'Active';
+      item.false = '';
     }
   }
 }
 
 // This function checks for only one of checboxes is checking and return boolean
-function checkForCheckedCheckboxes () {
-  var checkboxChecked = list.some(function (item) {
-    return item.state === 'completed';
+function checkingForCheckedTodos () {
+  var checkboxChecked = list.some(function findingForCompletedState (item) {
+    return item.state === 'Completed';
   });
-
   return checkboxChecked;
 }
 
+//??? где лучше поставить этот обработчик сдесь или внутри рендерной функции ???
 
-noteList.addEventListener('dblclick', function activeNoteEditor (event) {
+/*
+todosList.addEventListener('dblclick', function activeTodosEditor (event) {
   var target = event.target;
 
   if (!target.classList.contains('list-item__text')) {
     return;
   }
-  var content = target.innerHTML;
-  var note = target.parentNode.parentNode;
-  var noteId = note.id;
+  var todosId = target.parentNode.parentNode.id;
 
-  checkForEddition(noteId, true, content);
-  renderingFiltredList();
+  setEditableState(todosId, true);
+  renderTodos();
+}, false);
+*/
+
+checkAllBtn.addEventListener('change', function checkAllTodos (event) {
+    //console.log(event.target);
+    checkAllTodos(this);
+    renderTodos();
 }, false);
 
 
-todos.addEventListener('blur', function focusLost(event) {
-  var target = event.target;
-  if(!target.classList.contains('list-item__edit-text')){
-    return;
-  } 
-  var content = target.value;
-  var note = target.parentNode;
-  var noteId = note.id;
-
-  checkForEddition(noteId, false, content);
-  renderingFiltredList(); 
-}, true);
-
-
-todos.addEventListener('change', function (event) {
+todosList.addEventListener('change', function checkTodos(event) {
   var target = event.target
   
-  if (target.classList.contains('list-item__checkbox')) {
-    var note = target.parentNode.parentNode;
-    var noteId = note.id;
+  if (!target.classList.contains('list-item__checkbox')) {return;}
 
-    checkForChecked(target, noteId);
-    renderingFiltredList();
-    
-  } else if (target.id === 'checK-all-btn') {
-    checkAllNotes(target);
-    renderingFiltredList();
-  } else {
-    return;
-  }
+  var todosId = target.parentNode.parentNode.id;
+  serchingForCheckedTodos(target, todosId);
+  renderTodos();
+
 }, false);
 
 
-noteList.addEventListener('click', function activateDelBtn(event) {
+todosList.addEventListener('click', function activateDelBtn(event) {
   var target = event.target;
-  var note = target.parentNode.parentNode;
+  var todos = target.parentNode.parentNode;
   if (!target.classList.contains('del-current-list-item')) {
     return;
   } 
-  deleteFromList('id', note.id);
-  renderingFiltredList();
+  deleteFromList('id', todos.id);
+  renderTodos();
 }, false); 
 
 
@@ -253,11 +258,11 @@ listFooter.addEventListener('click', function activateFilter(event) {
 
   if (target.classList.contains('list-items-filter')) {
     event.preventDefault();
-    filter = target.innerHTML;
-    renderingFiltredList();
+    filter = target.innerHTML;  //???//
+    renderTodos();
   } else if (target.id === 'del-checked-items-btn') {
-    deleteFromList('state', 'completed');
-    renderingFiltredList();
+    deleteFromList('state', 'Completed');
+    renderTodos();
   } else {
     return;
   }
@@ -275,8 +280,8 @@ todos.addEventListener('keyup', function(event) {
   } 
   if (target.id === 'list-display' && enterKey && target.value) {
     addToList();
-    renderingFiltredList();   
-    clearDisplay();
+    renderTodos();  
+    display.value = null; 
   } else if (target.classList.contains('list-item__edit-text') && enterKey && target.value) {
     target.blur();
   } else {
