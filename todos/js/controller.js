@@ -1,95 +1,92 @@
-(function (exports) { 
+(function (exports) {
 
-  exports.ready = function () {
-  	console.log('ready');
-  	viewModel.renderTodos(listModel.list, listModel.filter, listModel.list.length);
-  };
+  exports.controller = {
 
-  exports.enterKeyPressed = function (event) {
-    var target = event.target;
-    var enterKey = (event.keyCode === 13);
-      if (target.id === 'list-display' && enterKey && target.value) {
-      	if (!((target.value*1)&&(target.value !== 0))) {
-      	  return;
-      	}
-        listModel.addToList(target.value);
-        viewModel.clearDisplay();
-        viewModel.renderTodos(listModel.formFiltredList(), listModel.filter, listModel.list.length);  
-      }
-  };
+    ready: function () {
+  	         applications.viewModel.renderTodos(applications.listModel.getList(), applications.listModel.getFilter(), applications.listModel.getList().length);
+           },
 
-  exports.activateDelBtn = function (event) {
-    var target = event.target;
-    if (!target.classList.contains('del-current-list-item')) {return;}
-  	var todosId = target.parentNode.parentNode.id;
+    enterKeyPressed: function (event) {
+                       var target = event.target;
+                       var enterKey = (event.keyCode === 13);
+                       if (target.id === 'list-display' && enterKey && target.value) {
+
+      	                 if (!((target.value*1)&&(target.value !== 0))) { return; }
+      	 
+                         applications.listModel.addToList(target.value);
+                         applications.viewModel.clearDisplay();
+                         applications.viewModel.renderTodos(applications.listModel.formFiltredList(), applications.listModel.getFilter(), applications.listModel.getList().length);  
+                       }
+                     },
+
+    activateDelBtn: function (event) {
+                      var target = event.target;
+
+                      if (!target.classList.contains('del-current-list-item')) { return; }
+
+  	                  var todosId = target.parentNode.parentNode.id;
     
-    listModel.deleteFromList('id', todosId);
-    viewModel.renderTodos(listModel.formFiltredList(), listModel.filter, listModel.list.length);
+                      applications.listModel.deleteFromList('id', todosId);
+                      applications.viewModel.renderTodos(applications.listModel.formFiltredList(), applications.listModel.getFilter(), applications.listModel.getList().length);
+                    },
+
+    checkTodos: function (event) {
+                  var target = event.target; 
+
+                  if (!target.classList.contains('list-item__checkbox')) { return; }
+
+                  var todosId = target.parentNode.parentNode.id;
+                  var checkTodos = applications.listModel.getlistItem(todosId);
+                  if (target.checked) {    
+                    checkTodos.state = 'Completed';
+                    checkTodos.selection = true;
+                  } else {
+                    checkTodos.state = 'Active';
+                    checkTodos.selection = false;      
+                  }
+                  applications.viewModel.renderTodos(applications.listModel.formFiltredList(), applications.listModel.getFilter(), applications.listModel.getList().length, applications.listModel.checkingForCheckedTodos());
+                },
+
+    checkAllTodos: function (event) {
+  	                 var target = event.target;
+                     if (target.checked) {
+                       applications.listModel.changeListItemsParameters('state', 'selection', 'Completed', true);
+                     } else {
+                       applications.listModel.changeListItemsParameters('state', 'selection', 'Active', false);
+                     }
+                       applications.viewModel.renderTodos(applications.listModel.formFiltredList(), applications.listModel.getFilter(), applications.listModel.getList().length, applications.listModel.checkingForCheckedTodos());
+                   },
+
+    activateDelAllCheckedBtn: function (event) {
+                                var target = event.target;
+                                if (target.id === 'del-checked-items-btn') {
+                                  applications.listModel.deleteFromList('state', 'Completed');
+                                  applications.viewModel.renderTodos(applications.listModel.formFiltredList(), applications.listModel.getFilter(), applications.listModel.getList().length, applications.listModel.checkingForCheckedTodos());
+                                } 
+                              },
+
+    activateFilter: function (event) {
+                      var target = event.target;
+
+                      if (!target.classList.contains('list-items-filter')) { return; }
+
+                      event.preventDefault();
+                      applications.listModel.setFilter(target.innerHTML);
+                      applications.viewModel.renderTodos(applications.listModel.formFiltredList(), applications.listModel.getFilter(), applications.listModel.getList().length, applications.listModel.checkingForCheckedTodos());
+                    }, 
+
+    focusLost: function(event) {
+                 var target = event.target;
+                 var todosId = target.parentNode.id;
+                 var editedTodos = applications.listModel.getlistItem(todosId);
+                 editedTodos.edition = false;
+                 editedTodos.content = target.value;
+                 applications.viewModel.renderTodos(applications.listModel.formFiltredList(), applications.listModel.getFilter(), applications.listModel.getList().length, applications.listModel.checkingForCheckedTodos()); 
+               }
+                                                                                      
   };
 
-  exports.checkTodos = function (event) {
-    var target = event.target; 	
-    if (!target.classList.contains('list-item__checkbox')) {return;}
-    var todosId = target.parentNode.parentNode.id;
-
-    var checkTodos = listModel.getlistItem(todosId);
-    if (target.checked) {    
-      checkTodos.state = 'Completed';
-      checkTodos.selection = true;
-    } else {
-      checkTodos.state = 'Active';
-      checkTodos.selection = false;      
-    }
-    viewModel.renderTodos(listModel.formFiltredList(), listModel.filter, listModel.list.length, listModel.checkingForCheckedTodos());
-  };
-
-  exports.checkAllTodos = function (event) {
-  	var target = event.target;
-    if (target.checked) {
-      listModel.changeListItemsParameters('state', 'selection', 'Completed', true);
-    } else {
-      listModel.changeListItemsParameters('state', 'selection', 'Active', false);
-    }
-    viewModel.renderTodos(listModel.formFiltredList(), listModel.filter, listModel.list.length, listModel.checkingForCheckedTodos());
-  };
-
-  exports.activateDelAllCheckedBtn = function (event) {
-    var target = event.target;
-    if (target.id === 'del-checked-items-btn') {
-      listModel.deleteFromList('state', 'Completed');
-      viewModel.renderTodos(listModel.formFiltredList(), listModel.filter, listModel.list.length, listModel.checkingForCheckedTodos());
-    } 
-  };
-
-  exports.activateFilter = function (event) {
-    var target = event.target;
-    console.log(target);
-    if (!target.classList.contains('list-items-filter')){return;}
-      event.preventDefault();
-      listModel.setFilter(target.innerHTML);
-      viewModel.renderTodos(listModel.formFiltredList(), listModel.filter, listModel.list.length, listModel.checkingForCheckedTodos());
-  };
-/*
-  exports.activateTodosEditor = function(event) {
-    var target = event.target;   
-    var todosId = target.parentNode.parentNode.id;
-    var editor = target.parentNode.nextElementSibling;
-    var editedTodos = listModel.getlistItem(todosId);
-    editedTodos.edition = true;
-    editor.focus();
-    viewModel.renderTodos(listModel.formFiltredList(), listModel.filter, listModel.list.length, listModel.checkingForCheckedTodos());
-  };
-*/
-  exports.focusLost = function(event) {
-    var target = event.target;
-    var todosId = target.parentNode.id;
-    var editedTodos = listModel.getlistItem(todosId);
-    editedTodos.edition = false;
-    editedTodos.content = target.value;
-    viewModel.renderTodos(listModel.formFiltredList(), listModel.filter, listModel.list.length, listModel.checkingForCheckedTodos()); 
-  };
-
-})(this.controller = {});
+})(this.applications);
 
 
 

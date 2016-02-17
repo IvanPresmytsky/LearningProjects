@@ -8,6 +8,7 @@
   var listFooter = document.getElementById('footer');
 
   function formTodosMarkup (id, content, state, selection, edition) {
+    
     if (!edition) {
       var containerState = '';
       var editorState = '';
@@ -15,26 +16,30 @@
       var containerState = 'hidden';
       var editorState = 'visible';
     }
+
     var checked = '';
+
     if (state === 'Completed') {
       checked = 'checked';
     } 
+
     if (selection) {
       var selectionClass = 'list-item__text--checked';
     } else {
       var selectionClass = '';
     }
 
-  var listMarKup = '<li class="list-item-container__list-item" id="'+ id +'"> \
-                      <div class="list-item__visible-block '+ containerState +'"> \
-                        <input class="list-item__checkbox" id="checkbox-' + id + '" type="checkbox" name="todos-checkbox"' + checked +'/>\ ' +  
-                        '<label for="checkbox-' + id + '" class="list-item__checkbox-label"></label> \ ' +                    
-                        '<label class="list-item__text ' + selectionClass + '">' + content + '</label> \ ' +                    
-                        '<button class="list-item__del-btn  del-current-list-item">X</button> \
-                      </div> \
-                      <input type="text" class="list-item__edit-text ' + editorState + '" value="' + content + '"/> \
-                    </li>'
-  return listMarKup;              
+    var listMarKup = '<li class="list-item-container__list-item" id="'+ id +'"> \
+                        <div class="list-item__visible-block '+ containerState +'"> \
+                          <input class="list-item__checkbox" id="checkbox-' + id + '" type="checkbox" name="todos-checkbox"' + checked +'/>\ ' +  
+                          '<label for="checkbox-' + id + '" class="list-item__checkbox-label"></label> \ ' +                    
+                          '<label class="list-item__text ' + selectionClass + '">' + content + '</label> \ ' +                    
+                          '<button class="list-item__del-btn  del-current-list-item">X</button> \
+                        </div> \
+                        <input type="text" class="list-item__edit-text ' + editorState + '" value="' + content + '"/> \
+                      </li>'
+
+    return listMarKup;              
   }
 
 
@@ -61,7 +66,7 @@
         todosEditor.focus();
       }, false);
 
-      todosEditor.addEventListener('blur', controller.focusLost, true);
+      todosEditor.addEventListener('blur', applications.controller.focusLost, true);
 
     }
 
@@ -82,36 +87,43 @@
   }
 
 
-  exports.renderTodos = function(renderingList, filter, itemCounter, isChecked) {
-    var allFilter = document.getElementById('all-filter');
-    var activeFilter = document.getElementById('active-filter');
-    var completedFilter = document.getElementById('completed-filter');
 
-    allFilter.classList.remove('list-footer__filters--active');
-    activeFilter.classList.remove('list-footer__filters--active');
-    completedFilter.classList.remove('list-footer__filters--active');
+  exports.viewModel = {
 
-    if (filter === 'All') {
-      allFilter.classList.add('list-footer__filters--active');
-    } else if (filter === 'Active') {
-      activeFilter.classList.add('list-footer__filters--active');
-    } else if (filter === 'Completed') {
-      completedFilter.classList.add('list-footer__filters--active');
-    }
-    renderList(renderingList, itemCounter, isChecked); 
-  };
+    clearDisplay: function() {
+                    display.value = null;
+                  },
 
-  exports.clearDisplay = function() {
-    display.value = null;
+    renderTodos: function(renderingList, filter, itemCounter, isChecked) {
+                   var allFilter = document.getElementById('all-filter');
+                   var activeFilter = document.getElementById('active-filter');
+                   var completedFilter = document.getElementById('completed-filter');
+
+                   allFilter.classList.remove('list-footer__filters--active');
+                   activeFilter.classList.remove('list-footer__filters--active');
+                   completedFilter.classList.remove('list-footer__filters--active');
+
+                   if (filter === 'All') {
+                     allFilter.classList.add('list-footer__filters--active');
+                   } else if (filter === 'Active') {
+                     activeFilter.classList.add('list-footer__filters--active');
+                   } else if (filter === 'Completed') {
+                     completedFilter.classList.add('list-footer__filters--active');
+                   }
+                   renderList(renderingList, itemCounter, isChecked); 
+                 }
+
   };
   
-  document.addEventListener('DOMContentLoaded', controller.ready);
 
-  todosList.addEventListener('change', controller.checkTodos, false);
 
-  checkAllBtn.addEventListener('change', controller.checkAllTodos, false);
+  document.addEventListener('DOMContentLoaded', applications.controller.ready);
 
-  todos.addEventListener('keyup', controller.enterKeyPressed, false);
+  todosList.addEventListener('change', applications.controller.checkTodos, false);
+
+  checkAllBtn.addEventListener('change', applications.controller.checkAllTodos, false);
+
+  todos.addEventListener('keyup', applications.controller.enterKeyPressed, false);
 
   todos.addEventListener('keyup', function editorFocusLoss (event) {
     var target = event.target;
@@ -121,14 +133,11 @@
     } 
   }, false);
 
-  todosList.addEventListener('click', controller.activateDelBtn, false); 
+  todosList.addEventListener('click', applications.controller.activateDelBtn, false); 
 
-  listFooter.addEventListener('click', controller.activateFilter, false);
+  listFooter.addEventListener('click', applications.controller.activateFilter, false);
 
-  listFooter.addEventListener('click', controller.activateDelAllCheckedBtn, false);
+  listFooter.addEventListener('click', applications.controller.activateDelAllCheckedBtn, false);
 
-  
-  
-
-})(this.viewModel = {});
+})(this.applications);
 
