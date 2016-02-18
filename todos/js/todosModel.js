@@ -63,10 +63,9 @@ var applications = {};
     return checkboxChecked;
   }
 
-  function changeListItemsParameters (param1, param2, param1Value, param2Value) {
+  function changeListItemsParameters (param, paramValue) {
     for (var i = 0; i < list.length; i++) {
-      list[i][param1] = param1Value;
-      list[i][param2] = param2Value;
+      list[i][param] = paramValue;
     }         
   } 
 
