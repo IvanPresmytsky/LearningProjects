@@ -1,6 +1,13 @@
-(function (exports) {
+applications.controllers = {};
+
+applications.controllers.TodosController = (function todosControllerCreating() {
 
   var todos = document.getElementById('todos-container');
+
+  function TodosController(model) {
+    this.model = model;   
+  }
+
 
   function clearDisplay () {
   	var display = document.getElementById('todos-display');
@@ -14,34 +21,36 @@
   	var checkAllBtn = document.getElementById('checK-all-btn');
     var display = document.getElementById('todos-display');
 
-    checkAllBtn.addEventListener('change', checkAllTodos, false);
+    checkAllBtn.addEventListener('change', checkAllTodos.bind(this), false);
 
-    display.addEventListener('keyup', addItemToTodosList, false);
+    display.addEventListener('keyup', addItemToTodosList.bind(this), false);
 
-  	renderFiltredTodos(applications.todosModel.getList(), applications.todosModel.getFilter(), applications.todosModel.getList().length);
+    this.renderFiltredTodos(this.model.getList(), this.model.getFilter(), this.model.getList().length);
   }
 
 
   function renderHeader () {  
-    var todosHeaderMarkup = applications.todosView.formTodosHeaderMarkup();
+    var todosHeaderMarkup = applications.todosHeaderView.renderTodosHeader();
     
     todos.insertAdjacentHTML('afterBegin', todosHeaderMarkup);      
   }
 
+
   function renderFooter () {  
-    var todosFooterMarkup = applications.todosView.formTodosFooterMarkup();
+    var todosFooterMarkup = applications.todosFooterView.renderTodosFooter();
     
     todos.insertAdjacentHTML('beforeEnd', todosFooterMarkup);      
   }
 
+
   function renderTodosListContainer () {  
-    var todosListMarkup = applications.todosView.formTodosListMarkup();
+    var todosListMarkup = applications.todosListView.renderTodosList();
     
     todos.insertAdjacentHTML('beforeEnd', todosListMarkup);      
   }
 
 
-  function renderTodosList (renderingList, itemCounter, isChecked) {
+  function renderTodosList (renderingList, itemCounter) {
     var todosList = document.getElementById('list');
     var todosFooter = document.getElementById('footer');
     var checkAllBtn = document.getElementById('checK-all-btn');
@@ -52,18 +61,19 @@
 
       todosList = document.getElementById('list'); 
 
-      todosList.addEventListener('change', checkTodosItem, false);
+      todosList.addEventListener('change', checkTodosItem.bind(this), false);
 
-      todosList.addEventListener('keyup', editorFocusLoss, false);
+      todosList.addEventListener('keyup', editorFocusLoss.bind(this), false);
 
-      todosList.addEventListener('click', activateDelBtn, false);    	
+      todosList.addEventListener('click', activateDelBtn.bind(this), false);    	
     }
+    
        
     todosList.innerHTML = '';
   
     for (var i = 0, l = renderingList.length; i < l; i++) {
 
-      var todosItemMarkup = applications.todosView.formTodosItemMarkup(renderingList[i].id, renderingList[i].content, renderingList[i].state, renderingList[i].selection, renderingList[i].edition);
+      var todosItemMarkup = applications.todosItemView.renderTodosItem(renderingList[i].id, renderingList[i].content, renderingList[i].state, renderingList[i].selection, renderingList[i].edition);
 
       todosList.insertAdjacentHTML('beforeEnd', todosItemMarkup);
 
@@ -80,7 +90,7 @@
         todosEditor.focus();
       }, false);
 
-      todosEditor.addEventListener('blur', focusLost, true);
+      todosEditor.addEventListener('blur', focusLost.bind(this), true);
 
     }
 
@@ -90,9 +100,9 @@
 
       todosFooter = document.getElementById('footer');
 
-      todosFooter.addEventListener('click', activateFilter, false);
+      todosFooter.addEventListener('click', activateFilter.bind(this), false);
 
-      todosFooter.addEventListener('click', activateDelAllCheckedBtn, false);
+      todosFooter.addEventListener('click', activateDelAllCheckedBtn.bind(this), false);
     }
     
     var todosItemCounter = document.getElementById('counter');
@@ -107,7 +117,7 @@
       todosItemCounter.innerHTML = itemCounter;
     }
   
-    if (isChecked) {
+    if (this.model.checkingForCheckedTodos()) {
       delAllCheckedTodos.classList.add('todos-footer__del-btn--visible');
     } else {
       delAllCheckedTodos.classList.remove('todos-header__del-btn--visible');
@@ -115,7 +125,7 @@
   }
 
 
-  function renderFiltredTodos (renderingList, filter, itemCounter, isChecked) {
+  function renderFiltredTodos (renderingList, filter, itemCounter) {
   	var todosFooter = document.getElementById('footer');
 
   	if (todosFooter) {
@@ -136,20 +146,21 @@
       }
     }
 
-    addItemToTodosList(renderingList, itemCounter, isChecked); 
+    this.renderTodosList(renderingList, itemCounter); 
   }
 
 
   function addItemToTodosList (event) {
+
     var targetValue = event.target.value;
     var enterKey = (event.keyCode === 13);
 
     if (enterKey && targetValue) {
 
-      if (!((targetValue*1)&&(targetValue !== 0))) { return; }	 
-      applications.todosModel.addToList(targetValue);
+      if (!((targetValue*1)&&(targetValue !== 0))) { return; }
+      this.model.addToList(targetValue);
       clearDisplay();
-      renderFiltredTodos(applications.todosModel.formFiltredList(), applications.todosModel.getFilter(), applications.todosModel.getList().length);  
+      this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length);  
     }
   }
 
@@ -160,7 +171,7 @@
     if (!target.classList.contains('todos-item__checkbox')) { return; }
 
     var todosItemId = target.parentNode.parentNode.id;
-    var checkedTodosItem = applications.todosModel.getlistItem(todosItemId);
+    var checkedTodosItem = this.model.getlistItem(todosItemId);
     if (target.checked) {    
       checkedTodosItem.state = 'Completed';
       checkedTodosItem.selection = true;
@@ -169,7 +180,7 @@
       checkedTodosItem.selection = false;      
     }
 
-    renderFiltredTodos(applications.todosModel.formFiltredList(), applications.todosModel.getFilter(), applications.todosModel.getList().length, applications.todosModel.checkingForCheckedTodos());
+    this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length);
   }
 
 
@@ -177,14 +188,14 @@
   	var target = event.target;
 
     if (target.checked) {
-      applications.todosModel.changeListItemsParameters('state', 'Completed');
-      applications.todosModel.changeListItemsParameters('selection', true);
+      this.model.changeListItemsParameters('state', 'Completed');
+      this.model.changeListItemsParameters('selection', true);
     } else {
-      applications.todosModel.changeListItemsParameters('state', 'Active');
-      applications.todosModel.changeListItemsParameters('selection', false);
+      this.model.changeListItemsParameters('state', 'Active');
+      this.model.changeListItemsParameters('selection', false);
     }
 
-    renderFiltredTodos(applications.todosModel.formFiltredList(), applications.todosModel.getFilter(), applications.todosModel.getList().length, applications.todosModel.checkingForCheckedTodos());
+    this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length);
   }
 
 
@@ -205,8 +216,8 @@
 
   	var todosId = target.parentNode.parentNode.id;
     
-    applications.todosModel.deleteFromList('id', todosId);
-    renderFiltredTodos(applications.todosModel.formFiltredList(), applications.todosModel.getFilter(), applications.todosModel.getList().length);
+    this.model.deleteFromList('id', todosId);
+    this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length);
   }
 
 
@@ -214,8 +225,8 @@
     var target = event.target;
 
     if (target.id === 'del-checked-items-btn') {
-      applications.todosModel.deleteFromList('state', 'Completed');
-      renderFiltredTodos(applications.todosModel.formFiltredList(), applications.todosModel.getFilter(), applications.todosModel.getList().length, applications.todosModel.checkingForCheckedTodos());
+      this.model.deleteFromList('state', 'Completed');
+      this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length);
     } 
   }
 
@@ -226,27 +237,38 @@
     if (!target.classList.contains('todos-filter')) { return; }
 
     event.preventDefault();
-    applications.todosModel.setFilter(target.innerHTML);
-    renderFiltredTodos(applications.todosModel.formFiltredList(), applications.todosModel.getFilter(), applications.todosModel.getList().length, applications.todosModel.checkingForCheckedTodos());
+    this.model.setFilter(target.innerHTML);
+    this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length);
   }
 
 
   function focusLost (event) {
     var target = event.target;
     var todosId = target.parentNode.id;
-    var editedTodos = applications.todosModel.getlistItem(todosId);
+    var editedTodos = this.model.getlistItem(todosId);
 
     editedTodos.edition = false;
     editedTodos.content = target.value;
-    renderFiltredTodos(applications.todosModel.formFiltredList(), applications.todosModel.getFilter(), applications.todosModel.getList().length, applications.todosModel.checkingForCheckedTodos()); 
+    this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length); 
   } 
 
 
+  TodosController.prototype.clearDisplay = clearDisplay;
+  TodosController.prototype.todosReady = todosReady;
+  TodosController.prototype.renderHeader = renderHeader;
+  TodosController.prototype.renderFooter = renderFooter;
+  TodosController.prototype.renderTodosListContainer = renderTodosListContainer;
+  TodosController.prototype.renderTodosList = renderTodosList;
+  TodosController.prototype.renderFiltredTodos = renderFiltredTodos;
+  TodosController.prototype.addItemToTodosList = addItemToTodosList;
+  TodosController.prototype.checkTodosItem = checkTodosItem;
+  TodosController.prototype.checkAllTodos = checkAllTodos;
+  TodosController.prototype.editorFocusLoss = editorFocusLoss;
+  TodosController.prototype.activateDelBtn = activateDelBtn;
+  TodosController.prototype.activateDelAllCheckedBtn = activateDelAllCheckedBtn;
+  TodosController.prototype.activateFilter = activateFilter;
+  TodosController.prototype.focusLost = focusLost;
 
-  document.addEventListener('DOMContentLoaded', todosReady);
+  return TodosController;
 
-})(this.applications);
-
-
-
-
+})();

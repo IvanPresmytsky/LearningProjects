@@ -1,55 +1,60 @@
-var applications = {};
+var applications;
+if(!applications) applications = {};
+applications.models = {};
 
-(function (exports){
+applications.models.TodosModel = (function listModelCreation() {
 
-  var list = [{id: 1, state: "Active", selection: false, edition: false, content: "todo 1"}, 
-              {id: 2, state: "Active", selection: false, edition: false, content: "todo 2"}];             
-  var newListItemId = list.length;  
-  var filter = 'All';
+  function TodosModel () {
+    this.list = [{id: 1, state: "Active", selection: false, edition: false, content: "todo 1"}, 
+                {id: 2, state: "Active", selection: false, edition: false, content: "todo 2"}];             
+    this.newListItemId = this.list.length;  
+    this.filter = 'All';
+  }
+  
 
 
 
-  function getList () { return list; }
+  function getList () { return this.list; }
 
-  function getFilter() { return filter; }
+  function getFilter() { return this.filter; }
 
-  function getNewListItemId () { return newListItemId; }
+  function getNewListItemId () { return this.newListItemId; }
 
   function getlistItem (id) {
-  	var listItem = list.find( function getListItemById (item) {
+  	var listItem = this.list.find( function getListItemById (item) {
       return item.id == id;
   	});
   	return listItem;
   }
 
   function setFilter (filterValue) {
-  	filter = filterValue;
+  	this.filter = filterValue;
   }
                        
   function addToList (content) {
-    newListItemId++;
+    this.newListItemId++;
     var newListItem = {
-      id: newListItemId,
+      id: this.newListItemId,
       state: 'Active',
       selection: false,
       edition: false,
       content: content  
     }
-    list.push(newListItem);
+    this.list.push(newListItem);
   }
 
   function deleteFromList (parameter, id) {
-    list = list.filter(function deleteItem (item) {
+    this.list = this.list.filter(function deleteItem (item) {
       return item[parameter] != id;	
     });
   }
 
   function formFiltredList () {
-    var currentFilter = filter;
+    var currentFilter = this.filter;
     if (currentFilter === 'All') {
-      return list;
+      return this.list;
     } else {
-      var filtredList = list.filter(function deleteItem (item) {
+      var filtredList = this.list.filter(function deleteItem (item) {
         return item.state === currentFilter;	
       });
       return filtredList;
@@ -57,43 +62,44 @@ var applications = {};
   }
 
   function checkingForCheckedTodos () {
-    var checkboxChecked = list.some(function findingForCompletedState (item) {
+    var checkboxChecked = this.list.some(function findingForCompletedState (item) {
       return item.state === 'Completed';
     });
     return checkboxChecked;
   }
 
   function changeListItemsParameters (param, paramValue) {
-    for (var i = 0; i < list.length; i++) {
-      list[i][param] = paramValue;
+    for (var i = 0; i < this.list.length; i++) {
+      this.list[i][param] = paramValue;
     }         
   } 
 
 
 
-  exports.todosModel = {
-
-  	getList: getList,
-
-  	getFilter: getFilter,
-
-  	getNewListItemId: getNewListItemId,
-
-    getlistItem: getlistItem,
-
-  	setFilter: setFilter,
-                       
-    addToList: addToList,
-
-    deleteFromList: deleteFromList,
-
-    formFiltredList: formFiltredList,
-
-    checkingForCheckedTodos: checkingForCheckedTodos,
-
-    changeListItemsParameters: changeListItemsParameters
-
-  };
   
-})(this.applications);
+  TodosModel.prototype.getList = getList;
+
+  TodosModel.prototype.getFilter = getFilter;
+
+  TodosModel.prototype.getNewListItemId = getNewListItemId;
+
+  TodosModel.prototype.getlistItem = getlistItem;
+
+  TodosModel.prototype.setFilter = setFilter;
+                       
+  TodosModel.prototype.addToList = addToList;
+
+  TodosModel.prototype.deleteFromList = deleteFromList;
+
+  TodosModel.prototype.formFiltredList = formFiltredList;
+
+  TodosModel.prototype.checkingForCheckedTodos = checkingForCheckedTodos;
+
+  TodosModel.prototype.changeListItemsParameters = changeListItemsParameters;
+
+
+  return TodosModel;
+  
+})();
+
 
