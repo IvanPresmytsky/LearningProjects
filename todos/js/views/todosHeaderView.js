@@ -1,3 +1,5 @@
+applications.views = {};
+
 (function (exports){
 
   function renderTodosHeader () {

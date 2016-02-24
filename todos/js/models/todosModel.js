@@ -1,6 +1,5 @@
 var applications;
 if(!applications) applications = {};
-
 applications.models = {};
 
 applications.models.TodosModel = (function listModelCreation() {

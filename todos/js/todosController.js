@@ -1,11 +1,14 @@
 applications.controllers = {};
-
 applications.controllers.TodosController = (function todosControllerCreating() {
 
   var todos = document.getElementById('todos-container');
 
-  function TodosController(model) {
-    this.model = model;   
+  function TodosController(model, filterModel) {
+    this.model = model;
+    this.filterModel = filterModel;
+    this.render = function () {
+      this.renderFiltredTodos(this.model.getList(), this.filterModel.getFilter(), this.model.getList().length);
+    };   
   }
 
 
@@ -15,36 +18,22 @@ applications.controllers.TodosController = (function todosControllerCreating() {
   }
 
 
-  function todosReady () {
-  	renderHeader();
-
-  	var checkAllBtn = document.getElementById('checK-all-btn');
-    var display = document.getElementById('todos-display');
-
-    checkAllBtn.addEventListener('change', checkAllTodos.bind(this), false);
-
-    display.addEventListener('keyup', addItemToTodosList.bind(this), false);
-
-    this.renderFiltredTodos(this.model.getList(), this.model.getFilter(), this.model.getList().length);
-  }
-
-
   function renderHeader () {  
-    var todosHeaderMarkup = applications.todosHeaderView.renderTodosHeader();
+    var todosHeaderMarkup = applications.views.todosHeaderView.renderTodosHeader();
     
     todos.insertAdjacentHTML('afterBegin', todosHeaderMarkup);      
   }
 
 
   function renderFooter () {  
-    var todosFooterMarkup = applications.todosFooterView.renderTodosFooter();
+    var todosFooterMarkup = applications.views.todosFooterView.renderTodosFooter();
     
     todos.insertAdjacentHTML('beforeEnd', todosFooterMarkup);      
   }
 
 
   function renderTodosListContainer () {  
-    var todosListMarkup = applications.todosListView.renderTodosList();
+    var todosListMarkup = applications.views.todosListView.renderTodosList();
     
     todos.insertAdjacentHTML('beforeEnd', todosListMarkup);      
   }
@@ -53,9 +42,22 @@ applications.controllers.TodosController = (function todosControllerCreating() {
   function renderTodosList (renderingList, itemCounter) {
     var todosList = document.getElementById('list');
     var todosFooter = document.getElementById('footer');
+    var todosHeader = document.getElementById('header');
     var checkAllBtn = document.getElementById('checK-all-btn');
-    
 
+
+   if (!todosHeader) {
+      renderHeader();
+
+      var display = document.getElementById('todos-display');
+      checkAllBtn = document.getElementById('checK-all-btn');
+      
+      checkAllBtn.addEventListener('change', checkAllTodos.bind(this), false);
+
+      display.addEventListener('keyup', addItemToTodosList.bind(this), false);  
+    }
+
+    
     if (!todosList) {
       renderTodosListContainer();
 
@@ -73,7 +75,7 @@ applications.controllers.TodosController = (function todosControllerCreating() {
   
     for (var i = 0, l = renderingList.length; i < l; i++) {
 
-      var todosItemMarkup = applications.todosItemView.renderTodosItem(renderingList[i].id, renderingList[i].content, renderingList[i].state, renderingList[i].selection, renderingList[i].edition);
+      var todosItemMarkup = applications.views.todosItemView.renderTodosItem(renderingList[i].id, renderingList[i].content, renderingList[i].state, renderingList[i].selection, renderingList[i].edition);
 
       todosList.insertAdjacentHTML('beforeEnd', todosItemMarkup);
 
@@ -160,7 +162,7 @@ applications.controllers.TodosController = (function todosControllerCreating() {
       if (!((targetValue*1)&&(targetValue !== 0))) { return; }
       this.model.addToList(targetValue);
       clearDisplay();
-      this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length);  
+      this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length);  
     }
   }
 
@@ -180,7 +182,7 @@ applications.controllers.TodosController = (function todosControllerCreating() {
       checkedTodosItem.selection = false;      
     }
 
-    this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length);
+    this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length);
   }
 
 
@@ -195,7 +197,7 @@ applications.controllers.TodosController = (function todosControllerCreating() {
       this.model.changeListItemsParameters('selection', false);
     }
 
-    this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length);
+    this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length);
   }
 
 
@@ -205,7 +207,8 @@ applications.controllers.TodosController = (function todosControllerCreating() {
 
     if (target.classList.contains('todos-item__edit-text') && enterKey && target.value) {
       target.blur();
-    }
+    } 
+    
   } 
 
 
@@ -217,7 +220,7 @@ applications.controllers.TodosController = (function todosControllerCreating() {
   	var todosId = target.parentNode.parentNode.id;
     
     this.model.deleteFromList('id', todosId);
-    this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length);
+    this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length);
   }
 
 
@@ -226,7 +229,7 @@ applications.controllers.TodosController = (function todosControllerCreating() {
 
     if (target.id === 'del-checked-items-btn') {
       this.model.deleteFromList('state', 'Completed');
-      this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length);
+      this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length);
     } 
   }
 
@@ -237,8 +240,8 @@ applications.controllers.TodosController = (function todosControllerCreating() {
     if (!target.classList.contains('todos-filter')) { return; }
 
     event.preventDefault();
-    this.model.setFilter(target.innerHTML);
-    this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length);
+    this.filterModel.setFilter(target.innerHTML);
+    this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length);
   }
 
 
@@ -248,13 +251,18 @@ applications.controllers.TodosController = (function todosControllerCreating() {
     var editedTodos = this.model.getlistItem(todosId);
 
     editedTodos.edition = false;
-    editedTodos.content = target.value;
-    this.renderFiltredTodos(this.model.formFiltredList(), this.model.getFilter(), this.model.getList().length); 
+
+    if (target.value === "") {
+      this.model.deleteFromList('id', todosId);
+    } else {
+      editedTodos.content = target.value;
+    }
+    
+    this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length); 
   } 
 
 
   TodosController.prototype.clearDisplay = clearDisplay;
-  TodosController.prototype.todosReady = todosReady;
   TodosController.prototype.renderHeader = renderHeader;
   TodosController.prototype.renderFooter = renderFooter;
   TodosController.prototype.renderTodosListContainer = renderTodosListContainer;

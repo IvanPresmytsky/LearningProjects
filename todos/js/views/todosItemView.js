@@ -44,7 +44,7 @@
   };
 
 
-})(this.applications);
+})(this.applications.views);
 
 
 
