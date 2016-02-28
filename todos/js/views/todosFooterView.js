@@ -1,4 +1,4 @@
-(function (exports){
+applications.views.renderTodosFooter = (function (){
 
   function renderTodosFooter () {
 
@@ -18,11 +18,7 @@
   }
 
 
-  exports.todosFooterView = {
-
-    renderTodosFooter: renderTodosFooter
-
-  };
+  return renderTodosFooter;
 
 
-})(this.applications.views);
+})();

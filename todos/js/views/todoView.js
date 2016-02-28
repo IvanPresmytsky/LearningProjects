@@ -1,6 +1,6 @@
-(function (exports){
+applications.views.renderTodo =  (function () {
 
-  function renderTodosItem (id, content, state, selection, edition) {
+  function renderTodo (id, content, state, selection, edition) {
     
     if (!edition) {
       var containerState = '';
@@ -22,7 +22,7 @@
       var selectionClass = '';
     }
 
-    var TodosItemMarKup = '<li class="todos-item-container__todos-item" id="'+ id +'"> \
+    var TodoMarKup = '<li class="todos-item-container__todos-item" id="'+ id +'"> \
                         <div class="todos-item__visible-block '+ containerState +'"> \
                           <input class="todos-item__checkbox" id="checkbox-' + id + '" type="checkbox" name="todos-checkbox"' + checked +'/>\ ' +  
                           '<label for="checkbox-' + id + '" class="todos-item__checkbox-label"></label> \ ' +                    
@@ -32,19 +32,12 @@
                         <input type="text" class="todos-item__edit-text ' + editorState + '" value="' + content + '"/> \
                       </li>';
 
-    return TodosItemMarKup;              
+    return TodoMarKup;              
   }
 
+  return renderTodo;
 
-
-  exports.todosItemView = {
-
-    renderTodosItem: renderTodosItem
-
-  };
-
-
-})(this.applications.views);
+})();
 
 
 

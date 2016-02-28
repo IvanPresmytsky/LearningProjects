@@ -1,56 +1,65 @@
 applications.controllers = {};
-applications.controllers.TodosController = (function todosControllerCreating() {
+applications.controllers.TodosController = (function todosControllerModule() {
 
-  var todos = document.getElementById('todos-container');
+  //var todos = document.getElementById('todos-container');
 
-  function TodosController(model, filterModel) {
+  function TodosController(model, filterModel, title, id) {
+    this.container = document.getElementById('container' + this.id);
     this.model = model;
-    this.filterModel = filterModel;
-    this.render = function () {
-      this.renderFiltredTodos(this.model.getList(), this.filterModel.getFilter(), this.model.getList().length);
-    };   
+    this.filterModel = filterModel; 
+    this.title = title; 
+    this.id = id;
   }
 
+  function render () {
+    var body = document.body;
+    var todosContainerMarkup = applications.views.renderTodosContainer(this.title, this.id);
+    
+    body.insertAdjacentHTML('afterBegin', todosContainerMarkup);
+
+    this.container = document.getElementById('container' + this.id);
+
+    this.renderFiltredTodos(this.model.getList(), this.filterModel.get(), this.model.getList().length);
+  }
 
   function clearDisplay () {
-  	var display = document.getElementById('todos-display');
+  	var display = this.container.querySelector('#todos-display');
     display.value = null;
   }
 
 
-  function renderHeader () {  
-    var todosHeaderMarkup = applications.views.todosHeaderView.renderTodosHeader();
-    
-    todos.insertAdjacentHTML('afterBegin', todosHeaderMarkup);      
+  function renderHeader () {
+    this.todos = this.container.querySelector('.todos-container');  
+    var todosHeaderMarkup = applications.views.renderTodosHeader();
+
+    this.todos.insertAdjacentHTML('afterBegin', todosHeaderMarkup);      
   }
 
 
-  function renderFooter () {  
-    var todosFooterMarkup = applications.views.todosFooterView.renderTodosFooter();
+  function renderFooter () {
+    var todosFooterMarkup = applications.views.renderTodosFooter();
     
-    todos.insertAdjacentHTML('beforeEnd', todosFooterMarkup);      
+    this.todos.insertAdjacentHTML('beforeEnd', todosFooterMarkup);      
   }
 
 
-  function renderTodosListContainer () {  
-    var todosListMarkup = applications.views.todosListView.renderTodosList();
+  function renderTodosListContainer () {
+    var todosListMarkup = applications.views.renderTodosList();
     
-    todos.insertAdjacentHTML('beforeEnd', todosListMarkup);      
+    this.todos.insertAdjacentHTML('beforeEnd', todosListMarkup);      
   }
 
 
   function renderTodosList (renderingList, itemCounter) {
-    var todosList = document.getElementById('list');
-    var todosFooter = document.getElementById('footer');
-    var todosHeader = document.getElementById('header');
-    var checkAllBtn = document.getElementById('checK-all-btn');
-
+    var todosList = this.container.querySelector('#list');
+    var todosFooter = this.container.querySelector('#footer');
+    var todosHeader = this.container.querySelector('#header');
+    var checkAllBtn = this.container.querySelector('#checK-all-btn');
 
    if (!todosHeader) {
-      renderHeader();
-
-      var display = document.getElementById('todos-display');
-      checkAllBtn = document.getElementById('checK-all-btn');
+      this.renderHeader();
+      var display = this.container.querySelector('#todos-display');
+      checkAllBtn = this.container.querySelector('#checK-all-btn');
       
       checkAllBtn.addEventListener('change', checkAllTodos.bind(this), false);
 
@@ -59,9 +68,9 @@ applications.controllers.TodosController = (function todosControllerCreating() {
 
     
     if (!todosList) {
-      renderTodosListContainer();
+      this.renderTodosListContainer();
 
-      todosList = document.getElementById('list'); 
+      todosList = this.container.querySelector('#list'); 
 
       todosList.addEventListener('change', checkTodosItem.bind(this), false);
 
@@ -75,7 +84,7 @@ applications.controllers.TodosController = (function todosControllerCreating() {
   
     for (var i = 0, l = renderingList.length; i < l; i++) {
 
-      var todosItemMarkup = applications.views.todosItemView.renderTodosItem(renderingList[i].id, renderingList[i].content, renderingList[i].state, renderingList[i].selection, renderingList[i].edition);
+      var todosItemMarkup = applications.views.renderTodo(renderingList[i].id, renderingList[i].content, renderingList[i].state, renderingList[i].selection, renderingList[i].edition);
 
       todosList.insertAdjacentHTML('beforeEnd', todosItemMarkup);
 
@@ -98,17 +107,17 @@ applications.controllers.TodosController = (function todosControllerCreating() {
 
       
     if (!todosFooter) {	
-      renderFooter();
+      this.renderFooter();
 
-      todosFooter = document.getElementById('footer');
+      todosFooter = this.container.querySelector('#footer');
 
       todosFooter.addEventListener('click', activateFilter.bind(this), false);
 
       todosFooter.addEventListener('click', activateDelAllCheckedBtn.bind(this), false);
     }
     
-    var todosItemCounter = document.getElementById('counter');
-    var delAllCheckedTodos = document.getElementById('del-checked-items-btn'); 
+    var todosItemCounter = this.container.querySelector('#counter');
+    var delAllCheckedTodos = this.container.querySelector('#del-checked-items-btn'); 
 
     if (itemCounter === 0) {	      
       todosFooter.classList.remove('todos-footer--visible');
@@ -119,21 +128,21 @@ applications.controllers.TodosController = (function todosControllerCreating() {
       todosItemCounter.innerHTML = itemCounter;
     }
   
-    if (this.model.checkingForCheckedTodos()) {
+    if (this.model.containsCompleted()) {
       delAllCheckedTodos.classList.add('todos-footer__del-btn--visible');
     } else {
-      delAllCheckedTodos.classList.remove('todos-header__del-btn--visible');
+      delAllCheckedTodos.classList.remove('todos-footer__del-btn--visible');
     }
   }
 
 
   function renderFiltredTodos (renderingList, filter, itemCounter) {
-  	var todosFooter = document.getElementById('footer');
+  	var todosFooter = this.container.querySelector('footer');
 
   	if (todosFooter) {
-      var allFilter = document.getElementById('all-filter');
-      var activeFilter = document.getElementById('active-filter');
-      var completedFilter = document.getElementById('completed-filter');
+      var allFilter = this.container.querySelector('all-filter');
+      var activeFilter = this.container.querySelector('active-filter');
+      var completedFilter = this.container.querySelector('completed-filter');
 
       allFilter.classList.remove('todos-footer__filters--active');
       activeFilter.classList.remove('todos-footer__filters--active');
@@ -156,48 +165,61 @@ applications.controllers.TodosController = (function todosControllerCreating() {
 
     var targetValue = event.target.value;
     var enterKey = (event.keyCode === 13);
-
-    if (enterKey && targetValue) {
-
-      if (!((targetValue*1)&&(targetValue !== 0))) { return; }
-      this.model.addToList(targetValue);
-      clearDisplay();
-      this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length);  
+    if (enterKey && (targetValue.search(/\S/) === -1)) {
+      this.clearDisplay(); 
+      return; 
+    }
+    if (enterKey && targetValue) {  
+      this.model.add(targetValue);
+      this.clearDisplay();
+      this.renderFiltredTodos(this.model.filter(this.filterModel.get()), this.filterModel.get(), this.model.getList().length);  
     }
   }
 
 
   function checkTodosItem (event) {
     var target = event.target; 
+    var checkAllBtn = this.container.querySelector('#checK-all-btn');
 
     if (!target.classList.contains('todos-item__checkbox')) { return; }
 
     var todosItemId = target.parentNode.parentNode.id;
     var checkedTodosItem = this.model.getlistItem(todosItemId);
     if (target.checked) {    
-      checkedTodosItem.state = 'Completed';
-      checkedTodosItem.selection = true;
+      checkedTodosItem.setState('Completed');
+      checkedTodosItem.setSelection(true);
     } else {
-      checkedTodosItem.state = 'Active';
-      checkedTodosItem.selection = false;      
+      checkedTodosItem.setState('Active');
+      checkedTodosItem.setSelection(false);      
+    }
+    if (target.checked === false && checkAllBtn.checked) {    
+      checkAllBtn.checked = false;
     }
 
-    this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length);
+    this.renderFiltredTodos(this.model.filter(this.filterModel.get()), this.filterModel.get(), this.model.getList().length);
   }
 
 
   function checkAllTodos (event) {
   	var target = event.target;
-
+    var list = this.model.getList();
     if (target.checked) {
-      this.model.changeListItemsParameters('state', 'Completed');
-      this.model.changeListItemsParameters('selection', true);
+      for (var i = 0; i < list.length; i++) {
+        list[i].state = 'Completed';
+        list[i].selection = true;
+      } 
+     // this.model.changeListItemsParameters('state', 'Completed');
+      //this.model.changeListItemsParameters('selection', true);
     } else {
-      this.model.changeListItemsParameters('state', 'Active');
-      this.model.changeListItemsParameters('selection', false);
+      for (var i = 0; i < list.length; i++) {
+        list[i].state = 'Active';
+        list[i].selection = false;
+      } 
+      //this.model.changeListItemsParameters('state', 'Active');
+      //this.model.changeListItemsParameters('selection', false);
     }
-
-    this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length);
+    
+    this.renderFiltredTodos(this.model.filter(this.filterModel.get()), this.filterModel.get(), this.model.getList().length);
   }
 
 
@@ -219,8 +241,8 @@ applications.controllers.TodosController = (function todosControllerCreating() {
 
   	var todosId = target.parentNode.parentNode.id;
     
-    this.model.deleteFromList('id', todosId);
-    this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length);
+    this.model.remove('id', todosId);
+    this.renderFiltredTodos(this.model.filter(this.filterModel.get()), this.filterModel.get(), this.model.getList().length);
   }
 
 
@@ -228,8 +250,8 @@ applications.controllers.TodosController = (function todosControllerCreating() {
     var target = event.target;
 
     if (target.id === 'del-checked-items-btn') {
-      this.model.deleteFromList('state', 'Completed');
-      this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length);
+      this.model.remove('state', 'Completed');
+      this.renderFiltredTodos(this.model.filter(this.filterModel.get()), this.filterModel.get(), this.model.getList().length);
     } 
   }
 
@@ -240,8 +262,8 @@ applications.controllers.TodosController = (function todosControllerCreating() {
     if (!target.classList.contains('todos-filter')) { return; }
 
     event.preventDefault();
-    this.filterModel.setFilter(target.innerHTML);
-    this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length);
+    this.filterModel.set(target.innerHTML);
+    this.renderFiltredTodos(this.model.filter(this.filterModel.get()), this.filterModel.get(), this.model.getList().length);
   }
 
 
@@ -253,16 +275,17 @@ applications.controllers.TodosController = (function todosControllerCreating() {
     editedTodos.edition = false;
 
     if (target.value === "") {
-      this.model.deleteFromList('id', todosId);
+      this.model.remove('id', todosId);
     } else {
       editedTodos.content = target.value;
     }
     
-    this.renderFiltredTodos(this.model.getFiltredList(this.filterModel.getFilter()), this.filterModel.getFilter(), this.model.getList().length); 
+    this.renderFiltredTodos(this.model.filter(this.filterModel.get()), this.filterModel.get(), this.model.getList().length); 
   } 
 
 
   TodosController.prototype.clearDisplay = clearDisplay;
+  TodosController.prototype.render = render;
   TodosController.prototype.renderHeader = renderHeader;
   TodosController.prototype.renderFooter = renderFooter;
   TodosController.prototype.renderTodosListContainer = renderTodosListContainer;

@@ -1,6 +1,6 @@
 applications.views = {};
 
-(function (exports){
+applications.views.renderTodosHeader = (function (){
 
   function renderTodosHeader () {
     var headerMarkup = '<div class="todos-header" id="header"> \
@@ -10,11 +10,6 @@ applications.views = {};
     return headerMarkup;        
   }
 
-  exports.todosHeaderView = {
+  return renderTodosHeader;
 
-    renderTodosHeader: renderTodosHeader
-
-  };
-
-
-})(this.applications.views);
+})();

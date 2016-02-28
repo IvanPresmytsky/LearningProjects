@@ -1,4 +1,4 @@
-(function (exports){
+applications.views.renderTodosList = (function (){
 
   function renderTodosList () {
     var listMarkup = '<div class="list-item-container" id="list-item-container"> \
@@ -7,11 +7,7 @@
     return listMarkup;        
   }
 
-  exports.todosListView = {
-
-    renderTodosList: renderTodosList
-
-  };
+  return renderTodosList;
 
 
-})(this.applications.views);
+})();
