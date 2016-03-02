@@ -1,16 +1,46 @@
 var applications = applications || {};
 
-applications.models = {};
+applications.models = applications.models || {};
 
 applications.models.TodosModel = (function todosModelModule() {
 
+
+
   function TodosModel () {
-    this.list = [];             
-    this.newListItemId = this.list.length;  
+    this.list = []; 
+    this.listeners = {};
+    this.newListItemId = this.list.length;
   }
 
-  function setDefaultTodo (todo) {
-    this.list.push(todo);
+  function on (obj, evt, callback) {
+    if (!this.listeners.hasOwnProperty(evt)) {
+      this.listeners[evt] = [];
+    }
+    this.listeners[evt].push(obj[callback].bind(obj));
+  }
+
+  function off (obj, evt, callback) {
+    if (this.listeners.hasOwnProperty(evt)) {
+      for (var i = 0; i < this.listeners[evt].length; i++) {
+        if (this.listeners[evt][i] === obj[callback].bind(obj)) {
+           this.listeners[evt].splice(i, 1);
+        }
+      }
+    }
+  }
+
+  function trigger (evt) {
+    if (this.listeners.hasOwnProperty(evt)) {
+      for (var i = 0; i < this.listeners[evt].length; i++) {
+        this.listeners[evt][i]();
+      }
+    }
+
+  }
+
+  function reset (list) {
+    this.list = list;
+    this.trigger('reset', this.list, this.list.length); 
   }
 
   function getList () { return this.list; }
@@ -22,7 +52,7 @@ applications.models.TodosModel = (function todosModelModule() {
       return item.id == id;
     });
   }
-                       
+
   function add (content) {
     this.newListItemId++;
 
@@ -30,15 +60,17 @@ applications.models.TodosModel = (function todosModelModule() {
       var newListItem = new applications.models.TodoModel((this.newListItemId + 10000), content);
     } else {
       var newListItem = new applications.models.TodoModel(this.newListItemId, content);
-    } 
+    }
 
     this.list.push(newListItem);
+    this.trigger('add');
   }
 
   function remove (parameter, id) {
     this.list = this.list.filter(function deleteItem (item) {
       return item[parameter] != id; 
     });
+    this.trigger('remove');
   }
 
   function filter (currentFilter) {
@@ -56,22 +88,22 @@ applications.models.TodosModel = (function todosModelModule() {
       return item.state === 'Completed';
     });
   }
-  /*
-  function changeListItemsParameters (param, paramValue) {
-    for (var i = 0; i < this.list.length; i++) {
-      this.list[i][param] = paramValue;
-    }         
-  } 
-*/
 
-  TodosModel.prototype.setDefaultTodo = setDefaultTodo;
+  
+  TodosModel.prototype.on = on;
+
+  TodosModel.prototype.off = off;
+
+  TodosModel.prototype.trigger = trigger;
+
+  TodosModel.prototype.reset = reset;
   
   TodosModel.prototype.getList = getList;
 
   TodosModel.prototype.getNewListItemId = getNewListItemId;
 
   TodosModel.prototype.getlistItem = getlistItem;
-                      
+
   TodosModel.prototype.add = add;
 
   TodosModel.prototype.remove = remove;
@@ -80,11 +112,9 @@ applications.models.TodosModel = (function todosModelModule() {
 
   TodosModel.prototype.containsCompleted = containsCompleted;
 
-  //TodosModel.prototype.changeListItemsParameters = changeListItemsParameters;
-
 
   return TodosModel;
-  
+
 })();
 
 

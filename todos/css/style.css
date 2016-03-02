@@ -47,11 +47,11 @@
 }
 
 .todos-item__visible-block{
-  display: block;  
+  display: block;
 }
 
 .todos-item__visible-block.hidden{
-  display: none;  
+  display: none;
 }
 
 .todos-item__edit-text {
