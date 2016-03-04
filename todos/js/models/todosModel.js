@@ -12,6 +12,12 @@ applications.models.TodosModel = (function todosModelModule() {
     this.newListItemId = this.list.length;
   }
 
+
+  function subscribe (todo) {
+    todo.on(this, 'destroy', 'remove');
+    todo.on(this, 'change', 'todoChange');
+  }
+
   function on (obj, evt, callback) {
     if (!this.listeners.hasOwnProperty(evt)) {
       this.listeners[evt] = [];
@@ -35,17 +41,22 @@ applications.models.TodosModel = (function todosModelModule() {
         this.listeners[evt][i]();
       }
     }
-
   }
 
   function reset (list) {
     this.list = list;
+
+    for (var i = 0; i < this.list.length; i++) {
+      var item = this.list[i];
+      this.subscribe(item);
+    }
+
     this.trigger('reset', this.list, this.list.length); 
   }
 
   function getList () { return this.list; }
 
-  function getNewListItemId () { return this.newListItemId; }
+  //function getNewListItemId () { return this.newListItemId; }
 
   function getlistItem (id) {
     return this.list.find( function getListItemById (item) {
@@ -63,12 +74,13 @@ applications.models.TodosModel = (function todosModelModule() {
     }
 
     this.list.push(newListItem);
+    this.subscribe(newListItem);
     this.trigger('add');
   }
 
-  function remove (parameter, id) {
+  function remove (todo) {
     this.list = this.list.filter(function deleteItem (item) {
-      return item[parameter] != id; 
+      return item[todo.parameter] != todo.id; 
     });
     this.trigger('remove');
   }
@@ -89,6 +101,12 @@ applications.models.TodosModel = (function todosModelModule() {
     });
   }
 
+  function todoChange () {
+    console.log(this.list);
+  }
+
+
+  TodosModel.prototype.subscribe = subscribe;
   
   TodosModel.prototype.on = on;
 
@@ -96,11 +114,13 @@ applications.models.TodosModel = (function todosModelModule() {
 
   TodosModel.prototype.trigger = trigger;
 
+  TodosModel.prototype.todoChange = todoChange;
+
   TodosModel.prototype.reset = reset;
   
   TodosModel.prototype.getList = getList;
 
-  TodosModel.prototype.getNewListItemId = getNewListItemId;
+  //TodosModel.prototype.getNewListItemId = getNewListItemId;
 
   TodosModel.prototype.getlistItem = getlistItem;
 

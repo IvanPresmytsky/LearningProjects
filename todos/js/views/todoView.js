@@ -1,8 +1,8 @@
 applications.views.renderTodo =  (function () {
 
-  function renderTodo (id, content, state, selection, edition) {
+  function renderTodo (todo) {
     
-    if (!edition) {
+    if (!todo.edition) {
       var containerState = '';
       var editorState = '';
     } else {
@@ -12,24 +12,24 @@ applications.views.renderTodo =  (function () {
 
     var checked = '';
 
-    if (state === 'Completed') {
+    if (todo.state === 'Completed') {
       checked = 'checked';
     } 
 
-    if (selection) {
+    if (todo.selection) {
       var selectionClass = 'todos-item__text--checked';
     } else {
       var selectionClass = '';
     }
 
-    var TodoMarKup = '<li class="todos-item-container__todos-item" id="'+ id +'"> \
+    var TodoMarKup = '<li class="todos-item-container__todos-item" id="'+ todo.id +'"> \
                         <div class="todos-item__visible-block '+ containerState +'"> \
-                          <input class="todos-item__checkbox" id="checkbox-' + id + '" type="checkbox" name="todos-checkbox"' + checked +'/>\ ' +  
-                          '<label for="checkbox-' + id + '" class="todos-item__checkbox-label"></label> \ ' +                    
-                          '<label class="todos-item__text ' + selectionClass + '">' + content + '</label> \ ' +                    
+                          <input class="todos-item__checkbox" id="checkbox-' + todo.id + '" type="checkbox" name="todos-checkbox"' + checked +'/>\ ' +  
+                          '<label for="checkbox-' + todo.id + '" class="todos-item__checkbox-label"></label> \ ' +                    
+                          '<label class="todos-item__text ' + selectionClass + '">' + todo.content + '</label> \ ' +                    
                           '<button class="todos-item__del-btn  del-current-todos-item">X</button> \
                         </div> \
-                        <input type="text" class="todos-item__edit-text ' + editorState + '" value="' + content + '"/> \
+                        <input type="text" class="todos-item__edit-text ' + editorState + '" value="' + todo.content + '"/> \
                       </li>';
 
     return TodoMarKup;              
