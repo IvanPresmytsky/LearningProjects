@@ -5,17 +5,17 @@ applications.models.TodosFilterModel = (function TodosFilterModelModule () {
     this.listeners = {};
   }
 
-  function on (obj, evt, callback) {
+  function on (evt, callback) {
     if (!this.listeners.hasOwnProperty(evt)) {
       this.listeners[evt] = [];
     }
-    this.listeners[evt].push(obj[callback].bind(obj));
+    this.listeners[evt].push(callback);
   }
 
-  function off (obj, evt, callback) {
+  function off (evt, callback) {
     if (this.listeners.hasOwnProperty(evt)) {
       for (var i = 0; i < this.listeners[evt].length; i++) {
-        if (this.listeners[evt][i] === obj[callback].bind(obj)) {
+        if (this.listeners[evt][i] === callback) {
            this.listeners[evt].splice(i, 1);
         }
       }

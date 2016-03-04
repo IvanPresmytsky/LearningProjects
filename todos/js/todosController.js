@@ -11,10 +11,10 @@ applications.controllers.TodosController = (function todosControllerModule() {
 
   function subscribe () {
     var self = this;
-    this.model.on(self, 'reset', 'render');
-    this.model.on(self, 'add', 'render');
-    this.model.on(self, 'remove', 'render');
-    this.filterModel.on(self, 'change', 'render');
+    this.model.on('reset', render.bind(self));
+    this.model.on('add', render.bind(self));
+    this.model.on('remove', render.bind(self));
+    this.filterModel.on('change', render.bind(self));
   }
 
   function render () {
@@ -30,7 +30,7 @@ applications.controllers.TodosController = (function todosControllerModule() {
       var list = this.model.getList();
       for (var i = 0; i < list.length; i++) {
         var item = list[i];
-        item.on(this, 'change', 'render');
+        item.on('change', render.bind(this));
       }
     }
 
@@ -187,7 +187,7 @@ applications.controllers.TodosController = (function todosControllerModule() {
     if (enterKey && targetValue) {
       this.model.add(targetValue);
       var todo = this.model.getList()[this.model.getList().length - 1];
-      todo.on(this, 'change', 'render');
+      todo.on('change', render.bind(this));
       this.clearDisplay(); 
     }
   }

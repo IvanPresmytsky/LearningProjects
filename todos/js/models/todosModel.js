@@ -14,28 +14,29 @@ applications.models.TodosModel = (function todosModelModule() {
 
 
   function subscribe (todo) {
-    todo.on(this, 'destroy', 'remove');
-    todo.on(this, 'change', 'todoChange');
+    todo.on('destroy', remove.bind(this));
+    todo.on('change', todoChange.bind(this));
   }
 
-  function on (obj, evt, callback) {
+  function on (evt, callback) {
+    console.log(callback);
     if (!this.listeners.hasOwnProperty(evt)) {
       this.listeners[evt] = [];
     }
-    this.listeners[evt].push(obj[callback].bind(obj));
+    this.listeners[evt].push(callback);
   }
 
-  function off (obj, evt, callback) {
+  function off (evt, callback) {
     if (this.listeners.hasOwnProperty(evt)) {
       for (var i = 0; i < this.listeners[evt].length; i++) {
-        if (this.listeners[evt][i] === obj[callback].bind(obj)) {
+        if (this.listeners[evt][i] === callback) {
            this.listeners[evt].splice(i, 1);
         }
       }
     }
   }
 
-  function trigger (evt) {
+  function trigger (evt, args) {
     if (this.listeners.hasOwnProperty(evt)) {
       for (var i = 0; i < this.listeners[evt].length; i++) {
         this.listeners[evt][i]();
@@ -51,7 +52,7 @@ applications.models.TodosModel = (function todosModelModule() {
       this.subscribe(item);
     }
 
-    this.trigger('reset', this.list, this.list.length); 
+    this.trigger('reset'); 
   }
 
   function getList () { return this.list; }
