@@ -2,13 +2,45 @@ var applications = applications || {};
 
 applications.models = applications.models || {};
 
-applications.models.TodosModel = (function todosModelModule() {
 
+applications.eventMixin = {
+  on: function (event, callback) {
+    if(!this.listeners) { this.listeners = {}; }
+
+    if (!this.listeners.hasOwnProperty(event)) {
+       this.listeners[event] = [];
+    }
+    this.listeners[event].push(callback);
+  },
+
+  off: function off (evt, callback) {
+    if (this.listeners.hasOwnProperty(event)) {
+      for (var i = 0; i < this.listeners[event].length; i++) {
+        if (this.listeners[event][i] === callback) {
+           this.listeners[event].splice(i, 1);
+        }
+      }
+    }
+  },
+
+  trigger: function trigger (event, args) {
+    if (this.listeners && this.listeners.hasOwnProperty(event)) {
+      for (var i = 0; i < this.listeners[event].length; i++) {
+        this.listeners[event][i](args);
+      }
+    }
+  }
+
+};
+
+
+
+
+applications.models.TodosModel = (function todosModelModule() {
 
 
   function TodosModel () {
     this.list = []; 
-    this.listeners = {};
     this.newListItemId = this.list.length;
   }
 
@@ -18,46 +50,18 @@ applications.models.TodosModel = (function todosModelModule() {
     todo.on('change', todoChange.bind(this));
   }
 
-  function on (evt, callback) {
-    console.log(callback);
-    if (!this.listeners.hasOwnProperty(evt)) {
-      this.listeners[evt] = [];
-    }
-    this.listeners[evt].push(callback);
-  }
-
-  function off (evt, callback) {
-    if (this.listeners.hasOwnProperty(evt)) {
-      for (var i = 0; i < this.listeners[evt].length; i++) {
-        if (this.listeners[evt][i] === callback) {
-           this.listeners[evt].splice(i, 1);
-        }
-      }
-    }
-  }
-
-  function trigger (evt, args) {
-    if (this.listeners.hasOwnProperty(evt)) {
-      for (var i = 0; i < this.listeners[evt].length; i++) {
-        this.listeners[evt][i]();
-      }
-    }
-  }
-
   function reset (list) {
     this.list = list;
-
     for (var i = 0; i < this.list.length; i++) {
       var item = this.list[i];
       this.subscribe(item);
     }
-
-    this.trigger('reset'); 
+    
+    this.trigger('reset', {list: this.list}); 
   }
 
   function getList () { return this.list; }
 
-  //function getNewListItemId () { return this.newListItemId; }
 
   function getlistItem (id) {
     return this.list.find( function getListItemById (item) {
@@ -76,14 +80,14 @@ applications.models.TodosModel = (function todosModelModule() {
 
     this.list.push(newListItem);
     this.subscribe(newListItem);
-    this.trigger('add');
+    this.trigger('add', {list: this.list});
   }
 
   function remove (todo) {
     this.list = this.list.filter(function deleteItem (item) {
       return item[todo.parameter] != todo.id; 
     });
-    this.trigger('remove');
+    this.trigger('remove', {list: this.list});
   }
 
   function filter (currentFilter) {
@@ -103,25 +107,23 @@ applications.models.TodosModel = (function todosModelModule() {
   }
 
   function todoChange () {
-    console.log(this.list);
+    this.trigger('reset', {list: this.list}); 
   }
 
 
   TodosModel.prototype.subscribe = subscribe;
   
-  TodosModel.prototype.on = on;
+  TodosModel.prototype.on = applications.eventMixin.on;
 
-  TodosModel.prototype.off = off;
+  TodosModel.prototype.off = applications.eventMixin.off;
 
-  TodosModel.prototype.trigger = trigger;
+  TodosModel.prototype.trigger = applications.eventMixin.trigger;
 
   TodosModel.prototype.todoChange = todoChange;
 
   TodosModel.prototype.reset = reset;
   
   TodosModel.prototype.getList = getList;
-
-  //TodosModel.prototype.getNewListItemId = getNewListItemId;
 
   TodosModel.prototype.getlistItem = getlistItem;
 

@@ -7,32 +7,6 @@ applications.models.TodoModel = (function todoModelModule() {
     this.state = 'Active';
     this.selection = false;
     this.edition = false;
-    this.listeners = {};
-  }
-
-  function on (evt, callback) {
-    if (!this.listeners.hasOwnProperty(evt)) {
-      this.listeners[evt] = [];
-    }
-    this.listeners[evt].push(callback);
-  }
-
-  function off (evt, callback) {
-    if (this.listeners.hasOwnProperty(evt)) {
-      for (var i = 0; i < this.listeners[evt].length; i++) {
-        if (this.listeners[evt][i] === callback) {
-           this.listeners[evt].splice(i, 1);
-        }
-      }
-    }
-  }
-
-  function trigger (evt, args) {
-    if (this.listeners.hasOwnProperty(evt)) {
-      for (var i = 0; i < this.listeners[evt].length; i++) {
-        this.listeners[evt][i](args);
-      }
-    }
   }
 
   function destroy () {
@@ -47,11 +21,11 @@ applications.models.TodoModel = (function todoModelModule() {
   }
 
 
-  TodoModel.prototype.on = on;
+  TodoModel.prototype.on = applications.eventMixin.on;
 
-  TodoModel.prototype.off = off;
+  TodoModel.prototype.off = applications.eventMixin.off;
 
-  TodoModel.prototype.trigger = trigger;
+  TodoModel.prototype.trigger = applications.eventMixin.trigger;
 
   TodoModel.prototype.destroy = destroy;
 

@@ -17,7 +17,8 @@ applications.controllers.TodosController = (function todosControllerModule() {
     this.filterModel.on('change', render.bind(self));
   }
 
-  function render () {
+  function render (todos) {
+
     if (!this.container) {
 
       var body = document.body;
@@ -26,21 +27,22 @@ applications.controllers.TodosController = (function todosControllerModule() {
       body.insertAdjacentHTML('afterBegin', todosContainerMarkup);
 
       this.container = document.getElementById(this.id);
-
-      var list = this.model.getList();
-      for (var i = 0; i < list.length; i++) {
-        var item = list[i];
-        item.on('change', render.bind(this));
-      }
     }
 
-    var model = this.model;
-    var filterModel = this.filterModel;
-    var renderedTodos = {
-      filter: filterModel.get(),
-      list: model.filter(filterModel.get()),
-      counter: model.getList().length
+    if (todos.filter) {
+      var model = this.model;
+      var renderedTodos = {
+        filter: todos.filter,
+        list: this.model.filter(todos.filter),
+        counter: this.model.getList().length
+      };
+    } else {
+      var renderedTodos = {
+        list: todos.list,
+        counter: todos.list.length
+      };
     }
+    
 
     this.renderFiltredTodos(renderedTodos);
   }
@@ -152,12 +154,12 @@ applications.controllers.TodosController = (function todosControllerModule() {
 
   function renderFiltredTodos (renderedTodos) {
     this.container = document.getElementById(this.id);
-    var todosFooter = this.container.querySelector('footer');
+    var todosFooter = this.container.querySelector('#footer');
 
   if (todosFooter) {
-      var allFilter = this.container.querySelector('all-filter');
-      var activeFilter = this.container.querySelector('active-filter');
-      var completedFilter = this.container.querySelector('completed-filter');
+      var allFilter = this.container.querySelector('#all-filter');
+      var activeFilter = this.container.querySelector('#active-filter');
+      var completedFilter = this.container.querySelector('#completed-filter');
 
       allFilter.classList.remove('todos-footer__filters--active');
       activeFilter.classList.remove('todos-footer__filters--active');
@@ -186,8 +188,6 @@ applications.controllers.TodosController = (function todosControllerModule() {
     }
     if (enterKey && targetValue) {
       this.model.add(targetValue);
-      var todo = this.model.getList()[this.model.getList().length - 1];
-      todo.on('change', render.bind(this));
       this.clearDisplay(); 
     }
   }

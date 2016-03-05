@@ -2,32 +2,6 @@ applications.models.TodosFilterModel = (function TodosFilterModelModule () {
 
   function TodosFilterModel (filter) {
     this.filter = filter;
-    this.listeners = {};
-  }
-
-  function on (evt, callback) {
-    if (!this.listeners.hasOwnProperty(evt)) {
-      this.listeners[evt] = [];
-    }
-    this.listeners[evt].push(callback);
-  }
-
-  function off (evt, callback) {
-    if (this.listeners.hasOwnProperty(evt)) {
-      for (var i = 0; i < this.listeners[evt].length; i++) {
-        if (this.listeners[evt][i] === callback) {
-           this.listeners[evt].splice(i, 1);
-        }
-      }
-    }
-  }
-
-  function trigger (evt) {
-    if (this.listeners.hasOwnProperty(evt)) {
-      for (var i = 0; i < this.listeners[evt].length; i++) {
-        this.listeners[evt][i]();
-      }
-    }
   }
 
 
@@ -35,15 +9,15 @@ applications.models.TodosFilterModel = (function TodosFilterModelModule () {
 
   function set (filter) { 
     this.filter = filter;
-    this.trigger('change');
+    this.trigger('change', {filter: this.filter});
   }
 
 
-  TodosFilterModel.prototype.on = on;
+  TodosFilterModel.prototype.on = applications.eventMixin.on;
 
-  TodosFilterModel.prototype.off = off;
+  TodosFilterModel.prototype.off = applications.eventMixin.off;
 
-  TodosFilterModel.prototype.trigger = trigger;
+  TodosFilterModel.prototype.trigger = applications.eventMixin.trigger;
 
   TodosFilterModel.prototype.get = get;
 
