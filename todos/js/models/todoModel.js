@@ -21,18 +21,13 @@ applications.models.TodoModel = (function todoModelModule() {
   }
 
 
-  TodoModel.prototype.on = applications.eventMixin.on;
-
-  TodoModel.prototype.off = applications.eventMixin.off;
-
-  TodoModel.prototype.trigger = applications.eventMixin.trigger;
-
   TodoModel.prototype.destroy = destroy;
 
   TodoModel.prototype.get = get;
 
   TodoModel.prototype.set = set;
 
+  applications.utils.extend(TodoModel, applications.mixins.eventMixin);
 
   return TodoModel;
   

@@ -1,43 +1,5 @@
-var applications = applications || {};
-
-applications.models = applications.models || {};
-
-
-applications.eventMixin = {
-  on: function (event, callback) {
-    if(!this.listeners) { this.listeners = {}; }
-
-    if (!this.listeners.hasOwnProperty(event)) {
-       this.listeners[event] = [];
-    }
-    this.listeners[event].push(callback);
-  },
-
-  off: function off (evt, callback) {
-    if (this.listeners.hasOwnProperty(event)) {
-      for (var i = 0; i < this.listeners[event].length; i++) {
-        if (this.listeners[event][i] === callback) {
-           this.listeners[event].splice(i, 1);
-        }
-      }
-    }
-  },
-
-  trigger: function trigger (event, args) {
-    if (this.listeners && this.listeners.hasOwnProperty(event)) {
-      for (var i = 0; i < this.listeners[event].length; i++) {
-        this.listeners[event][i](args);
-      }
-    }
-  }
-
-};
-
-
-
 
 applications.models.TodosModel = (function todosModelModule() {
-
 
   function TodosModel () {
     this.list = []; 
@@ -112,17 +74,11 @@ applications.models.TodosModel = (function todosModelModule() {
 
 
   TodosModel.prototype.subscribe = subscribe;
-  
-  TodosModel.prototype.on = applications.eventMixin.on;
-
-  TodosModel.prototype.off = applications.eventMixin.off;
-
-  TodosModel.prototype.trigger = applications.eventMixin.trigger;
 
   TodosModel.prototype.todoChange = todoChange;
 
   TodosModel.prototype.reset = reset;
-  
+
   TodosModel.prototype.getList = getList;
 
   TodosModel.prototype.getlistItem = getlistItem;
@@ -135,6 +91,7 @@ applications.models.TodosModel = (function todosModelModule() {
 
   TodosModel.prototype.containsCompleted = containsCompleted;
 
+  applications.utils.extend(TodosModel, applications.mixins.eventMixin);
 
   return TodosModel;
 

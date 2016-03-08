@@ -13,15 +13,11 @@ applications.models.TodosFilterModel = (function TodosFilterModelModule () {
   }
 
 
-  TodosFilterModel.prototype.on = applications.eventMixin.on;
-
-  TodosFilterModel.prototype.off = applications.eventMixin.off;
-
-  TodosFilterModel.prototype.trigger = applications.eventMixin.trigger;
-
   TodosFilterModel.prototype.get = get;
 
   TodosFilterModel.prototype.set = set;
+
+ applications.utils.extend(TodosFilterModel, applications.mixins.eventMixin);
 
 
   return TodosFilterModel;
