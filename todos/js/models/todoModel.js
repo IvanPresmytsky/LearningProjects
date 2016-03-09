@@ -9,26 +9,26 @@ applications.models.TodoModel = (function todoModelModule() {
     this.edition = false;
   }
 
+
   function destroy () {
     this.trigger('destroy', {parameter: 'id', id: this.id});
   }
 
-  function get (prop) { return this.prop; }
-    
-  function set (prop, value) {
-    this[prop] = value;
-    this.trigger('change');
-  }
 
+  TodoModel.prototype = Object.create(applications.models.Model.prototype);
+
+  TodoModel.prototype.constructor = TodoModel;
 
   TodoModel.prototype.destroy = destroy;
 
-  TodoModel.prototype.get = get;
+  TodoModel.prototype.set = function () {
 
-  TodoModel.prototype.set = set;
+    applications.models.Model.prototype.set.apply(this, arguments);
+    this.trigger('change', this);
 
-  applications.utils.extend(TodoModel, applications.mixins.eventMixin);
+  };
+
 
   return TodoModel;
-  
+
 })();

@@ -5,19 +5,16 @@ applications.models.TodosFilterModel = (function TodosFilterModelModule () {
   }
 
 
-  function get() { return this.filter; }
+  TodosFilterModel.prototype = Object.create(applications.models.Model.prototype);
 
-  function set (filter) { 
-    this.filter = filter;
-    this.trigger('change', {filter: this.filter});
-  }
+  TodosFilterModel.prototype.constructor = TodosFilterModel;
 
+  TodosFilterModel.prototype.set = function (filter) {
 
-  TodosFilterModel.prototype.get = get;
+    applications.models.Model.prototype.set.apply(this, arguments);
+    this.trigger('change', this);
 
-  TodosFilterModel.prototype.set = set;
-
- applications.utils.extend(TodosFilterModel, applications.mixins.eventMixin);
+  };
 
 
   return TodosFilterModel;

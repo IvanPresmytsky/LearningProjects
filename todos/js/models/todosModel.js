@@ -68,7 +68,9 @@ applications.models.TodosModel = (function todosModelModule() {
     });
   }
 
-  function todoChange () {
+  function todoChange (todo) {
+    var changedTodo = this.getlistItem(todo.id)
+    changedTodo = todo;
     this.trigger('reset', {list: this.list}); 
   }
 

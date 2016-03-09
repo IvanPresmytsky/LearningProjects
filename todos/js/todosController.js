@@ -287,7 +287,7 @@ applications.controllers.TodosController = (function todosControllerModule() {
     if (!target.classList.contains('todos-filter')) { return; }
 
     event.preventDefault();
-    this.filterModel.set(target.innerHTML);
+    this.filterModel.set('filter', target.innerHTML);
   }
 
 
