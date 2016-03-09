@@ -7,6 +7,7 @@ applications.models.Model = (function todoModelModule() {
 
   function set (prop, value) {
     this[prop] = value;
+    this.trigger('change', this);
   }
 
 

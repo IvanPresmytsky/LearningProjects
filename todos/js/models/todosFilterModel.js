@@ -9,13 +9,6 @@ applications.models.TodosFilterModel = (function TodosFilterModelModule () {
 
   TodosFilterModel.prototype.constructor = TodosFilterModel;
 
-  TodosFilterModel.prototype.set = function (filter) {
-
-    applications.models.Model.prototype.set.apply(this, arguments);
-    this.trigger('change', this);
-
-  };
-
 
   return TodosFilterModel;
 

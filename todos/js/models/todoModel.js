@@ -21,13 +21,6 @@ applications.models.TodoModel = (function todoModelModule() {
 
   TodoModel.prototype.destroy = destroy;
 
-  TodoModel.prototype.set = function () {
-
-    applications.models.Model.prototype.set.apply(this, arguments);
-    this.trigger('change', this);
-
-  };
-
 
   return TodoModel;
 
