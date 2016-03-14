@@ -1,6 +1,6 @@
 applications.utils = applications.utils || {};
 
-applications.utils.extend = (function () {
+applications.utils.extend = (function extendModule() {
 
   function extend (module, mixin) {
     for (var methodName in mixin) {

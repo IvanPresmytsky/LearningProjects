@@ -10,11 +10,10 @@ applications.controllers.TodosController = (function todosControllerModule() {
   }
 
   function subscribe () {
-    var self = this;
-    this.model.on('reset', render.bind(self));
-    this.model.on('add', render.bind(self));
-    this.model.on('remove', render.bind(self));
-    this.filterModel.on('change', render.bind(self));
+    this.model.on('reset', render.bind(this));
+    this.model.on('add', render.bind(this));
+    this.model.on('remove', render.bind(this));
+    this.filterModel.on('change', render.bind(this));
   }
 
   function render (todos) {
@@ -187,7 +186,7 @@ applications.controllers.TodosController = (function todosControllerModule() {
       return; 
     }
     if (enterKey && targetValue) {
-      this.model.add(targetValue);
+      this.model.add(applications.models.TodoModel, targetValue);
       this.clearDisplay(); 
     }
   }

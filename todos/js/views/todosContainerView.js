@@ -1,3 +1,5 @@
+applications.views = applications.views || {};
+
 applications.views.renderTodosContainer = (function (){
 
   function renderTodosContainer (id) {

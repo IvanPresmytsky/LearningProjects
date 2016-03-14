@@ -10,16 +10,9 @@ applications.models.TodoModel = (function todoModelModule() {
   }
 
 
-  function destroy () {
-    this.trigger('destroy', {parameter: 'id', id: this.id});
-  }
-
-
   TodoModel.prototype = Object.create(applications.models.Model.prototype);
 
   TodoModel.prototype.constructor = TodoModel;
-
-  TodoModel.prototype.destroy = destroy;
 
 
   return TodoModel;

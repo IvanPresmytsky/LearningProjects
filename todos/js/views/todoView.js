@@ -1,7 +1,7 @@
 applications.views.renderTodo =  (function () {
 
-  function renderTodo (todo) {
-    
+  function renderTodo (todo, trimContainer) {
+
     if (!todo.edition) {
       var containerState = '';
       var editorState = '';
@@ -31,8 +31,19 @@ applications.views.renderTodo =  (function () {
                         </div> \
                         <input type="text" class="todos-item__edit-text ' + editorState + '" value="' + todo.content + '"/> \
                       </li>';
+    
+    if (trimContainer) {
 
-    return TodoMarKup;              
+      return TodoMarKup = '<div class="todos-item__visible-block '+ containerState +'"> \
+                             <input class="todos-item__checkbox" id="checkbox-' + todo.id + '" type="checkbox" name="todos-checkbox"' + checked +'/>\ ' +  
+                            '<label for="checkbox-' + todo.id + '" class="todos-item__checkbox-label"></label> \ ' +                    
+                            '<label class="todos-item__text ' + selectionClass + '">' + todo.content + '</label> \ ' +                    
+                            '<button class="todos-item__del-btn  del-current-todos-item">X</button> \
+                           </div> \
+                           <input type="text" class="todos-item__edit-text ' + editorState + '" value="' + todo.content + '"/>'
+    }
+
+    return TodoMarKup;
   }
 
   return renderTodo;

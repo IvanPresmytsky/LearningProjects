@@ -4,8 +4,9 @@ var todo = new applications.models.TodoModel(169, 'Todo One');
 var todoTwo = new applications.models.TodoModel(190, 'Todo Two');
 var filtersModel = new applications.models.TodosFilterModel('All');
 
-var appController = new applications.controllers.TodosController(todosModel, filtersModel, 'containerOne');
-appController.subscribe();
+//var appController = new applications.controllers.TodosController(todosModel, filtersModel, 'containerOne');
+var appController = new applications.controllers.AppController(todosModel, filtersModel, 'containerOne');
+//appController.subscribe();
 
 var list = [];
 list.push(todo);
