@@ -45,14 +45,9 @@ applications.controllers.TodosListController = (function todosListControllerModu
   function renderTodosList (renderedTodos) {
 
     var todosList = this.container.querySelector('#list');
-
-    var todosHeader = this.container.querySelector('#header');
-
-
     todosList.innerHTML = '';
 
     for (var i = 0, l = renderedTodos.list.length; i < l; i++) {
-      console.log(todosList);
       var TodoController = new applications.controllers.TodoController(renderedTodos.list[i]);
       TodoController.renderTodo();
     }

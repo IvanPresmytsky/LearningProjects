@@ -13,35 +13,37 @@ applications.controllers.TodoController = (function todoControllerModule() {
 
   function renderTodo (todo) {
     var todosList = document.getElementById('list');
+    var todoTemplate = document.getElementById('todoTemplate').innerHTML;
+    var template = Handlebars.compile(todoTemplate);
+
     if (todo) {
-      var todoMarkup = applications.views.renderTodo(todo, true);
       var todoContainer = document.getElementById(todo.id);
-      todoContainer.innerHTML = todoMarkup;
+      todoContainer.outerHTML = template(todo);
+      todoContainer = document.getElementById(todo.id);
     } else {
-      var todoMarkup = applications.views.renderTodo(this.todo);
-      todosList.insertAdjacentHTML('beforeEnd', todoMarkup);
+      todosList.insertAdjacentHTML('beforeEnd', template(this.todo));
       var todoContainer = document.getElementById(this.todo.id);
     }
 
-   var todosEditor = todoContainer.querySelector('.todos-item__edit-text');
-   var todosLabel = todoContainer.querySelector('.todos-item__text');
-   var todosDelBtn = todoContainer.querySelector('.del-current-todos-item');
-   var todoCheckbox = todoContainer.querySelector('#checkbox-' + this.todo.id);
+    var todosEditor = todoContainer.querySelector('.todos-item__edit-text');
+    var todosLabel = todoContainer.querySelector('.todos-item__text');
+    var todosDelBtn = todoContainer.querySelector('.del-current-todos-item');
+    var todoCheckbox = todoContainer.querySelector('#checkbox-' + this.todo.id);
 
-   todosLabel.addEventListener('dblclick', editorFocus.bind(this), false);
+    todosLabel.addEventListener('dblclick', editorFocus.bind(this), false);
 
-   todosEditor.addEventListener('keyup', editorFocusLoss.bind(this), false);
+    todosEditor.addEventListener('keyup', editorFocusLoss.bind(this), false);
 
-   todosEditor.addEventListener('blur', focusLost.bind(this), true);
+    todosEditor.addEventListener('blur', focusLost.bind(this), true);
 
-   todosDelBtn.addEventListener('click', activateDelBtn.bind(this), false);
+    todosDelBtn.addEventListener('click', activateDelBtn.bind(this), false);
 
-   todoCheckbox.addEventListener('change', checkTodosItem.bind(this), false);
-
+    todoCheckbox.addEventListener('change', checkTodosItem.bind(this), false);
+    
   }
 
 
-   function activateDelBtn (event) { this.todo.destroy(); }
+  function activateDelBtn (event) { this.todo.destroy(); }
 
 
   function checkTodosItem (event) {

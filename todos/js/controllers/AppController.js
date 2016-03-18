@@ -24,9 +24,10 @@ applications.controllers.AppController = (function appControllerModule() {
   function firstRender () {
 
     var body = document.body;
-    var todosContainerMarkup = applications.views.renderTodosContainer(this.id);
+    var todosContainer = document.getElementById('todosContainerTemplate').innerHTML;
+    var template = Handlebars.compile(todosContainer);
 
-    body.insertAdjacentHTML('afterBegin', todosContainerMarkup);
+    body.insertAdjacentHTML('afterBegin', template(this));
 
     this.container = document.getElementById(this.id);
     this.renderHeader();
@@ -34,6 +35,7 @@ applications.controllers.AppController = (function appControllerModule() {
     this.todosListController = new applications.controllers.TodosListController(this.model, this.filterModel, this.id);
 
   }
+
 
   function render (todos) {
 
@@ -66,18 +68,19 @@ applications.controllers.AppController = (function appControllerModule() {
 
 
   function renderHeader (todos) {
- 
-      this.todos = this.container.querySelector('.todos-container');
-      var todosHeaderMarkup = applications.views.renderTodosHeader();
+    this.todos = this.container.querySelector('.todos-container');
 
-      this.todos.insertAdjacentHTML('afterBegin', todosHeaderMarkup);
-      this.header = this.todos.querySelector('#header');
-      this.checkAllBtn = this.header.querySelector('#check-all-btn');
-      this.display = this.header.querySelector('#todos-display');
+    var todosHeader = document.getElementById('todosHeaderTemplate').innerHTML;
+    var template = Handlebars.compile(todosHeader);
 
-      this.display.addEventListener('keyup', addTodo.bind(this), false);
+    this.todos.insertAdjacentHTML('afterBegin', template());
+    this.header = this.todos.querySelector('#header');
+    this.checkAllBtn = this.header.querySelector('#check-all-btn');
+    this.display = this.header.querySelector('#todos-display');
 
-      this.checkAllBtn.addEventListener('change', checkAllTodos.bind(this), false);
+    this.display.addEventListener('keyup', addTodo.bind(this), false);
+
+    this.checkAllBtn.addEventListener('change', checkAllTodos.bind(this), false);
   }
 
 
@@ -93,9 +96,10 @@ applications.controllers.AppController = (function appControllerModule() {
 
   function renderFooter (todos) {
 
-      var todosFooterMarkup = applications.views.renderTodosFooter();
+      var todosFooter = document.getElementById('todosFooterTemplate').innerHTML;
+      var template = Handlebars.compile(todosFooter);
 
-      this.todos.insertAdjacentHTML('beforeEnd', todosFooterMarkup);
+      this.todos.insertAdjacentHTML('beforeEnd', template());
 
       this.footer = this.container.querySelector('#footer');
 
@@ -113,9 +117,11 @@ applications.controllers.AppController = (function appControllerModule() {
 
 
   function renderTodosListContainer () {
-    var todosListMarkup = applications.views.renderTodosList();
+    var todosList = document.getElementById('todosListTemplate').innerHTML;
+    var template = Handlebars.compile(todosList);
 
-    this.todos.insertAdjacentHTML('beforeEnd', todosListMarkup);
+
+    this.todos.insertAdjacentHTML('beforeEnd', template());
   }
 
 

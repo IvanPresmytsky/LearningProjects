@@ -1,12 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-	<meta charset="UTF-8">
-	<title>todos</title>
-	<link href="css/style.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>todos</title>
+    <link href="css/style.css" rel="stylesheet">
   </head>
   <body>
-  
+
+    <script id="todosContainerTemplate" type="text/x-handlebars-template">
+      <div class="container" id="{{id}}"> 
+        <h1 class="main-title">todos</h1>
+        <div class="todos-container"> 
+        </div> 
+      </div>
+    </script>
+
+    <script id="todosHeaderTemplate" type="text/x-handlebars-template">
+      <div class="todos-header" id="header"> 
+        <input class="todos-header__btn" id="check-all-btn" type="checkbox"/>
+        <input class="todos-header__text-input" id="todos-display" type="text" placeholder="What needs to be done?"/>
+      </div>
+    </script>
+
+    <script id="todosListTemplate" type="text/x-handlebars-template">
+      <div class="list-item-container" id="list-item-container"> 
+        <ul class="todos-item-container__list" id="list"> 
+        </ul> 
+      </div>
+    </script>
+
+    <script id="todoTemplate" type="text/x-handlebars-template">
+      <li class="todos-item-container__todos-item" id="{{id}}"> 
+        <div class="todos-item__visible-block {{containerState}}"> 
+          <input class="todos-item__checkbox" id="checkbox-{{id}}" type="checkbox" name="todos-checkbox" {{#if selection}}checked{{/if}}/>
+          <label for="checkbox-{{id}}" class="todos-item__checkbox-label"></label> 
+          <label class="todos-item__text {{#if selection}}todos-item__text--checked{{/if}}">{{content}}</label> 
+          <button class="todos-item__del-btn  del-current-todos-item">X</button> 
+        </div> 
+        <input type="text" class="todos-item__edit-text {{editorState}}" value="{{content}}"/> 
+      </li>
+    </script>
+
+    <script id="todosFooterTemplate" type="text/x-handlebars-template">
+      <div class="todos-footer" id="footer"> 
+        <span class="todos-footer__counter"> 
+          <span id="counter"> 0 </span> 
+          items left 
+          </span> 
+        <ul class="todos-footer__filters" id="todos-filters"> 
+          <li> 
+            <a href="#" class="todos-filter" id="all-filter">All</a> 
+          </li> 
+          <li> 
+            <a href="#" class="todos-filter" id="active-filter">Active</a> 
+          </li> 
+          <li> 
+            <a href="#" class="todos-filter" id="completed-filter">Completed</a> 
+          </li> 
+        </ul> 
+        <button class="todos-footer__del-btn"  id="del-checked-items-btn">Clear completed</button> 
+      </div>
+    </script>
+
+    <script src="js/lib/handlebars-v4.0.5.js"></script>
     <script src="js/mixins/eventMixin.js"></script>
     <script src="js/utils/extend.js"></script>
     <script src="js/models/Model.js"></script>
