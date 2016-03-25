@@ -24,11 +24,8 @@ applications.models.TodosModel = (function todosModelModule() {
 
 
   TodosModel.prototype = Object.create(applications.models.Collection.prototype);
-
   TodosModel.prototype.constructor = constructor;
-
   TodosModel.prototype.filter = filter;
-
   TodosModel.prototype.containsCompleted = containsCompleted;
 
 

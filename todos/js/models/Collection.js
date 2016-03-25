@@ -17,6 +17,7 @@ applications.models.Collection = (function collectionModule() {
 
 
   function reset (list) {
+    console.log('reset');
     this.list = list;
     for (var i = 0; i < this.list.length; i++) {
       var item = this.list[i];
@@ -66,17 +67,11 @@ applications.models.Collection = (function collectionModule() {
 
 
   Collection.prototype.getList = getList;
-
   Collection.prototype.getlistItem = getlistItem;
-
   Collection.prototype.reset = reset;
-
   Collection.prototype.add = add;
-
   Collection.prototype.remove = remove;
-
   Collection.prototype.subscribe = subscribe;
-
   Collection.prototype.itemChange = itemChange;
 
   applications.utils.extend(Collection, applications.mixins.eventMixin);

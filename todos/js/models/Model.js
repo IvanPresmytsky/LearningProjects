@@ -16,9 +16,7 @@ applications.models.Model = (function todoModelModule() {
 
 
   Model.prototype.get = get;
-
   Model.prototype.set = set;
-
   Model.prototype.destroy = destroy;
 
   applications.utils.extend(Model, applications.mixins.eventMixin);
