@@ -2,7 +2,6 @@ applications.controllers.TodoController = (function todoControllerModule() {
 
   function TodoController(todo) {
     var todoTemplate = document.getElementById('todoTemplate').innerHTML;
-
     this.todo = todo;
     this.template = Handlebars.compile(todoTemplate);
     this.element = {};
@@ -20,27 +19,23 @@ applications.controllers.TodoController = (function todoControllerModule() {
   }
 
   function render (todo) {
-    var todosList = document.getElementById('list');
-
+    this.todoContainer = document.createElement('li');
     if (todo) {
-      this.todoContainer = document.getElementById(todo.id);
-      this.todoContainer.outerHTML = this.template(todo);
-      this.todoContainer = document.getElementById(todo.id);
-      this.element = this.template(todo);
+      this.todoContainer.innerHTML = this.template(todo);
     } else {
-      todosList.insertAdjacentHTML('beforeEnd', this.template(this.todo));
-      this.todoContainer = document.getElementById(this.todo.id);
-      this.element = this.template(this.todo);
+      this.todoContainer.innerHTML = this.template(this.todo);
     }
 
+    this.element = this.todoContainer.firstElementChild;
+    this.element.parentNode.remove();
     this.subscribeTodoElements();
   }
 
   function subscribeTodoElements () {
-    this.todosEditor = this.todoContainer.querySelector('.todos-item__edit-text');
-    this.todosLabel = this.todoContainer.querySelector('.todos-item__text');
-    this.todosDelBtn = this.todoContainer.querySelector('.del-current-todos-item');
-    this.todoCheckbox = this.todoContainer.querySelector('#checkbox-' + this.todo.id);
+    this.todosEditor = this.element.querySelector('.todos-item__edit-text');
+    this.todosLabel = this.element.querySelector('.todos-item__text');
+    this.todosDelBtn = this.element.querySelector('.del-current-todos-item');
+    this.todoCheckbox = this.element.querySelector('#checkbox-' + this.todo.id);
 
     this.todosLabel.addEventListener('dblclick', editorFocus.bind(this), false);
     this.todosEditor.addEventListener('keyup', editorFocusLoss.bind(this), false);
@@ -93,6 +88,7 @@ applications.controllers.TodoController = (function todoControllerModule() {
   function focusLost (event) {
     var value = event.target.value;
     if (value === "") {
+      this.remove(this.todo);
       this.todo.destroy();
     } else {
       this.todo.set('content', value);

@@ -12,12 +12,15 @@ applications.models.Collection = (function collectionModule() {
     item.on('change', itemChange.bind(this));
   }
 
+  function unsubscribe (item) {
+    item.off('destroy', remove.bind(this));
+    item.off('change', itemChange.bind(this));
+  }
 
   function getList () { return this.list; }
 
 
   function reset (list) {
-    console.log('reset');
     this.list = list;
     for (var i = 0; i < this.list.length; i++) {
       var item = this.list[i];
@@ -51,9 +54,11 @@ applications.models.Collection = (function collectionModule() {
 
 
   function remove (id) {
+    var deletedItem = this.getlistItem(id);
     this.list = this.list.filter(function deleteItem (item) {
       return item.id != id; 
     });
+    this.unsubscribe(deletedItem);
     this.trigger('remove', {list: this.list, counter: this.list.length});
   }
 
@@ -65,13 +70,13 @@ applications.models.Collection = (function collectionModule() {
   }
 
 
-
+  Collection.prototype.subscribe = subscribe;
+  Collection.prototype.unsubscribe = unsubscribe;
   Collection.prototype.getList = getList;
   Collection.prototype.getlistItem = getlistItem;
   Collection.prototype.reset = reset;
   Collection.prototype.add = add;
   Collection.prototype.remove = remove;
-  Collection.prototype.subscribe = subscribe;
   Collection.prototype.itemChange = itemChange;
 
   applications.utils.extend(Collection, applications.mixins.eventMixin);

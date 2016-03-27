@@ -11,12 +11,13 @@ applications.controllers.AppController = (function appControllerModule() {
     list.push(todoTwo);
 
     this.id = id || null;
-    this.elem = {};
+    this.element = {};
     this.template = Handlebars.compile(todosContainer);
 
     this.model = new applications.models.TodosModel();
     this.filterModel = new applications.models.TodosFilterModel('All');
 
+    
     this.render();
     this.model.reset(list);
   }
@@ -24,7 +25,7 @@ applications.controllers.AppController = (function appControllerModule() {
 
   function render () {
     var appControllerAPI;
-
+    this.todosListController = new applications.controllers.TodosListController(this.model, this.filterModel);
     if (this.id) {
       var body = document.body;
       appControllerAPI = {
@@ -32,16 +33,16 @@ applications.controllers.AppController = (function appControllerModule() {
       };
 
       body.insertAdjacentHTML('afterBegin', this.template(appControllerAPI));
-      //this.container = document.getElementById(this.id);
-      //this.todos = this.container.querySelector('.todos-container');
-      this.todosListController = new applications.controllers.TodosListController(this.model, this.filterModel, this.id);
-      //var todosHeader = this.todosListController.elem.headerElem;
-      //this.todos.insertAdjacentHTML('afterBegin', todosHeader);
+      this.container = document.getElementById(this.id);
+      this.container.appendChild(this.todosListController.element);
     } else {
       appControllerAPI = {
         id: 131313
       }
-      this.elem = this.template(appControllerAPI);
+      this.element = document.createElement('div');
+      this.element.insertAdjacentHTML('afterBegin', this.template(appControllerAPI));
+      this.container = document.getElementById(appControllerAPI.id);
+      this.container.appendChild(this.todosListController.element);
     }
 
   }
